@@ -1,0 +1,51 @@
+<h2 fxLayoutAlign="center center">New Account</h2>
+
+<mat-divider></mat-divider>
+
+<mat-tab-group [selectedIndex]="selected">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Create
+    </ng-template>
+    <ng-template matTabContent>
+      <form (ngSubmit)="createAccount()">
+        <mat-form-field class="full-width top-field">
+          <input matInput placeholder="Account Name" [formControl]="nameFormControl" required>
+          <mat-error *ngIf="nameFormControl.hasError('required')">
+            required
+          </mat-error>
+        </mat-form-field>
+        <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
+          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">Cancel</button>
+          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!nameFormControl.valid">Create</button>
+        </div>
+      </form>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Import
+    </ng-template>
+    <ng-template matTabContent>
+      <form [formGroup]="importForm" (ngSubmit)="importAccount()">
+        <mat-form-field class="full-width top-field">
+          <input matInput placeholder="Account Name" [formControl]="nameFormControl" required>
+          <mat-error *ngIf="nameFormControl.hasError('required')">
+            required
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput placeholder="Your private key" required [formControl]="privatekeyFormControl">
+          <mat-error *ngIf="privatekeyFormControl.hasError('required')">
+            required
+          </mat-error>
+        </mat-form-field>
+        <p class="attention"><strong>Imported accounts will not be associated with your originally created Mpurse account passphrase.</strong></p>
+        <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
+          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">Cancel</button>
+          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!importForm.valid">Import</button>
+        </div>
+      </form>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

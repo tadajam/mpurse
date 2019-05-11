@@ -1,0 +1,39 @@
+.full-width {
+  width: 100%;
+}
+
+.button-div {
+  button {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+  }
+}
+
+.fee-button-div {
+  padding-left: 1rem;
+}
+
+.send-form {
+  padding: 0.5rem;
+}
+
+.fee-slider {
+  padding-bottom: 0rem;
+}
+
+.result-div {
+  height: 4rem;
+}
+
+.available-button {
+  cursor : pointer;
+  color: gray;
+}
+
+.readonly-wrapper {
+  cursor: not-allowed;
+}
+
+.readonly-wrapper .readonly-block {
+  pointer-events: none;
+}

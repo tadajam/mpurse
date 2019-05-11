@@ -1,0 +1,114 @@
+<mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+
+<ng-container *ngIf="true">
+  <mat-toolbar fxLayout="row">
+    <button mat-icon-button [disabled]="true">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span fxFlex="auto"></span>
+
+    <button mat-button matTooltip="Copy to clipboard" class="copy-button" (click)="copyAddress()">
+      <h4 class="account-name">{{accountSummary.name}}</h4>
+      <p class="short-address">{{shortenAddress()}}</p>
+    </button>
+
+    <span fxFlex="auto"></span>
+
+    <button mat-icon-button [matMenuTriggerFor]="accountMenu">
+      <mat-icon>more_horiz</mat-icon>
+    </button>
+
+    <mat-menu #accountMenu="matMenu">
+      <button mat-menu-item routerLink="/details" [queryParams]="{ name: accountSummary.name, address: accountSummary.address }">
+        <mat-icon>description</mat-icon>
+        <span>Account Details</span>
+      </button>
+      <button mat-menu-item routerLink="/signature">
+        <mat-icon>create</mat-icon>
+        <span>Sign Message</span>
+      </button>
+      <button mat-menu-item routerLink="/transaction">
+        <mat-icon>border_color</mat-icon>
+        <span>Sign Transaction</span>
+      </button>
+      <button mat-menu-item (click)="viewMpchain()">
+        <mat-icon>launch</mat-icon>
+        <span>View on Mpchain</span>
+      </button>
+      <button mat-menu-item (click)="viewInsight()">
+        <mat-icon>launch</mat-icon>
+        <span>View on insight</span>
+      </button>
+      <button *ngIf="accountSummary.isImport" mat-menu-item routerLink="/remove" [queryParams]="{ name: accountSummary.name, address: accountSummary.address }">
+        <mat-icon>delete_forever</mat-icon>
+        <span>Remove Account</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+<mat-list>
+  <mat-list-item>
+    <img src="https://mpchain.info/icon/MONA.png" mat-list-icon />
+    <h4 mat-line>MONA</h4>
+    <p mat-line>
+      {{accountSummary.mona_balance}}
+      {{accountSummary.unconfirmed_mona_balance !== '' && accountSummary.unconfirmed_mona_balance !== '0.00000000' ?
+        ' (' + (reflectUnconfirmed(accountSummary.mona_balance, accountSummary.unconfirmed_mona_balance) | number:'1.8-8') + ')' : ''}}
+    </p>
+    <button mat-icon-button routerLink="/send" [queryParams]="{ asset: 'MONA' }" [disabled]="(accountSummary.mona_balance | number:'1.8-8') === '0.00000000'">
+      <mat-icon>send</mat-icon>
+    </button>
+  </mat-list-item>
+
+  <mat-list-item>
+    <img src="https://mpchain.info/icon/XMP.png" mat-list-icon />
+    <h4 mat-line>XMP</h4>
+    <p mat-line>
+      {{accountSummary.xmp_balance}}
+      {{accountSummary.unconfirmed_xmp_balance !== '' && accountSummary.unconfirmed_xmp_balance !== '0.00000000' ?
+        ' (' + (reflectUnconfirmed(accountSummary.xmp_balance, accountSummary.unconfirmed_xmp_balance) | number:'1.8-8') + ')' : ''}}
+    </p>
+    <button mat-icon-button routerLink="/send" [queryParams]="{ asset: 'XMP' }" [disabled]="(accountSummary.xmp_balance | number:'1.8-8') === '0.00000000'">
+      <mat-icon>send</mat-icon>
+    </button>
+  </mat-list-item>
+
+  <mat-divider></mat-divider>
+</mat-list>
+<ng-container>
+
+<ng-container *ngIf="! loading">
+  <mat-list>
+    <div  fxLayout="row">
+      <button mat-icon-button [disabled]="page === 1" (click)="getBalances(-page + 1)">
+        <mat-icon>first_page</mat-icon>
+      </button>
+      <button mat-icon-button [disabled]="page === 1" (click)="getBalances(-1)">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <p fxFlex="auto" fxLayoutAlign="center center">
+        {{(page - 1) * pageLimit + 1}} - {{((page - 1) * pageLimit + 10) > assetsTotal ? assetsTotal : (page - 1) * pageLimit + 10}} of {{assetsTotal}}
+      </p>
+      <button mat-icon-button [disabled]="assetsTotal <= page * pageLimit" (click)="getBalances(1)">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button mat-icon-button [disabled]="assetsTotal <= page * pageLimit" (click)="getBalances(maxPage() - page)">
+        <mat-icon>last_page</mat-icon>
+      </button>
+    </div>
+
+    <mat-list-item *ngFor="let asset of assets">
+      <img src="https://mpchain.info/icon/{{asset.asset}}.png" mat-list-icon />
+      <h4 mat-line>{{asset.asset_longname ? asset.asset_longname : asset.asset}}</h4>
+      <p mat-line>
+        {{asset.quantity}}
+        {{asset.unconfirmed_quantity !== '' && asset.unconfirmed_quantity !== '0.00000000' && asset.unconfirmed_quantity !== '0' ?
+          ' (' + (reflectUnconfirmed(asset.quantity, asset.unconfirmed_quantity) | number: isDivisible(asset.quantity) ? '1.8-8' : '') + ')' : ''}}
+      </p>
+      <button mat-icon-button routerLink="/send" [queryParams]="{ asset: asset.asset }" [disabled]="(asset.quantity | number:'1.8-8') === '0.00000000'">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+</ng-container>

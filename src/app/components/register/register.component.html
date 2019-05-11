@@ -1,0 +1,32 @@
+<h2 fxLayoutAlign="center center">REGISTER</h2>
+
+<mat-divider></mat-divider>
+
+<form [formGroup]="registerForm" (ngSubmit)="register()" class="register-form">
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <h3>Encrypt your passphrase.</h3>
+
+    <mat-form-field class="full-width">
+      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="New Password (min 8 chars)" formControlName="password" required />
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-error *ngIf="registerForm.hasError('required')">
+        Password field cannot be empty.
+      </mat-error>
+      <mat-error *ngIf="passwordControl.hasError('minlength')">
+        Password must be at least 8 characters.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <input matInput [type]="hide ? 'password' : 'text'" placeholder="Confirm Password" formControlName="confirmPassword" [errorStateMatcher]="matcher" />
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-error *ngIf="registerForm.hasError('notMatch')">
+        The password and the confirmation you typed do not match.
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
+    <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!registerForm.valid">Create</button>
+  </div>
+<form>

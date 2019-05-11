@@ -1,0 +1,38 @@
+.container {
+  padding: 0.5rem;
+}
+
+.ident-svg {
+  border-radius: 50px;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+  width: 38px;
+  height: 38px;
+  display: inline-block;
+}
+
+.account-name {
+  padding-left: 1rem;
+  margin: 0rem;
+  font-size: 1.2rem;
+}
+
+.account-address {
+  font-size: 0.9rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-div {
+  button {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+  }
+}
+
+.signature-form {
+  padding: 0.5rem;
+}

@@ -1,0 +1,50 @@
+
+<h2 fxLayoutAlign="center center">PASSPHRASE</h2>
+
+<mat-divider></mat-divider>
+
+<form [formGroup]="generateForm" (ngSubmit)="savePassphrase()" class="generate-form">
+  <mat-tab-group (selectedTabChange)="tabChanged($event)">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        Generate
+      </ng-template>
+      <ng-template matTabContent>
+        <p>Get Your Passphrase</p>
+        <mat-form-field class="full-width">
+          <textarea matInput readonly="true" formControlName="passphrase" required></textarea>
+          <mat-icon matSuffix (click)="generateRandomMnemonic()">refresh</mat-icon>
+        </mat-form-field>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        Import
+      </ng-template>
+      <ng-template matTabContent>
+        <p>Paste Your Passphrase</p>
+        <mat-form-field class="full-width">
+          <textarea matInput formControlName="passphrase" required></textarea>
+          <mat-error *ngIf="passphraseControl.hasError('required')">
+              required
+          </mat-error>
+          <mat-error *ngIf="passphraseControl.hasError('twelveWords')">
+              words12
+          </mat-error>
+        </mat-form-field>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <label fxLayout="row">
+    <mat-checkbox fxLayoutAlign="center center" formControlName="isSaved" required></mat-checkbox>
+    <p class="is-saved-label">I have written down or otherwise securely stored my passphrase.</p>
+  </label>
+  <mat-error *ngIf="isSavedControl.hasError('required')">
+    You should save passphrase.
+  </mat-error>
+
+  <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
+    <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!generateForm.valid">Save</button>
+  </div>
+</form>
