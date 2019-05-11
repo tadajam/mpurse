@@ -1,0 +1,60 @@
+<h2 fxLayoutAlign="center center">Signature Request</h2>
+
+<mat-divider></mat-divider>
+
+<div fxLayout="column" class="container">
+
+  <div fxLayout="row" fxLayoutAlign="center center">
+    <div fxLayoutAlign="center center">
+      <div *ngIf="trustSvg" class="ident-svg" [innerHTML]="trustSvg"></div>
+    </div>
+    <h3 fxLayoutAlign="center center" class="account-name">{{name}}</h3>
+  </div>
+
+  <p fxLayoutAlign="center center" class="account-address">{{address}}</p>
+
+  <mat-divider></mat-divider>
+
+
+
+  <form [formGroup]="signatureForm" (ngSubmit)="sign()" class="signature-form">
+
+    <mat-form-field class="full-width">
+      <mat-label>Message</mat-label>
+      <textarea matInput
+        [readonly]="request"
+        cdkTextareaAutosize
+        #autosize="cdkTextareaAutosize"
+        cdkAutosizeMinRows="2"
+        formControlName="message"
+        required>
+      </textarea>
+    </mat-form-field>
+
+    <mat-form-field class="full-width" *ngIf="! request && signatureControl.value">
+      <mat-label>Signature</mat-label>
+      <textarea matInput
+        readonly="true"
+        cdkTextareaAutosize
+        #autosize="cdkTextareaAutosize"
+        formControlName="signature">
+      </textarea>
+      <mat-icon matSuffix (click)="copy()">file_copy</mat-icon>
+    </mat-form-field>
+
+    <ng-container *ngIf="request">
+      <mat-divider></mat-divider>
+      <h3 fxLayoutAlign="center center">Request from '{{origin}}'</h3>
+    </ng-container>
+
+    <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
+      <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>Cancel</button>
+      <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!signatureForm.valid">Sign</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+

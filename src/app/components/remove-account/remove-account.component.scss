@@ -1,0 +1,38 @@
+.container {
+  padding: 1rem;
+}
+
+.ident-svg {
+  border-radius: 50px;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+  width: 38px;
+  height: 38px;
+  display: inline-block;
+}
+
+.account-name {
+  padding-left: 1rem;
+  margin: 0rem;
+  font-size: 1.2rem;
+}
+
+.account-address {
+  font-size: 0.9rem;
+}
+
+.attention {
+  color: red;
+  font-size: 0.8rem;
+  padding-top: 1rem;
+}
+
+.button-div {
+  padding-top: 1rem;
+  button {
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+  }
+}
+

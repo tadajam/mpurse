@@ -1,0 +1,22 @@
+mat-toolbar {
+  padding-left: 0rem;
+  padding-right: 0rem;
+  background-color: white;
+}
+
+.copy-button {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+
+  .account-name {
+    line-height: 100%;
+  }
+  
+  .short-address {
+    line-height: 100%;
+    color: gray;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+  }
+}
+

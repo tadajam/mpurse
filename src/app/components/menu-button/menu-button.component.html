@@ -1,0 +1,50 @@
+
+<button mat-icon-button isRoundButton="true" class="ident-button" [matMenuTriggerFor]="menu">
+  <mat-icon *ngIf="! trustSvg">more_vert</mat-icon>
+  <div *ngIf="trustSvg" class="ident-svg" [innerHTML]="trustSvg"></div>
+</button>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="accounts" *ngIf="isUnlocked">
+    <mat-icon>account_balance_wallet</mat-icon>
+    <span>Accounts</span>
+  </button>
+
+  <button mat-menu-item *ngIf="isUnlocked" (click)="lock()">
+    <mat-icon>lock</mat-icon>
+    <span>Lock Mpurse</span>
+  </button>
+
+  <mat-divider *ngIf="isUnlocked"></mat-divider>
+
+  <button mat-menu-item *ngIf="isUnlocked" routerLink="/add" [queryParams]='{ selected: 0 }'>
+    <mat-icon>add</mat-icon>
+    <span>Create Account</span>
+  </button>
+
+  <button mat-menu-item *ngIf="isUnlocked" routerLink="/add" [queryParams]='{ selected: 1 }'>
+    <mat-icon>input</mat-icon>
+    <span>Import Account</span>
+  </button>
+
+  <mat-divider *ngIf="isUnlocked"></mat-divider>
+
+  <button mat-menu-item *ngIf="existsVault" routerLink="/settings">
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </button>
+
+  <button mat-menu-item routerLink="/info">
+    <mat-icon>info</mat-icon>
+    <span>Information</span>
+  </button>
+</mat-menu>
+
+<mat-menu #accounts="matMenu">
+  <ng-container *ngFor="let identity of identities">
+    <button mat-menu-item (click)="changeAddresses(identity.address)">
+      <mat-icon [class.hidden]="identity.address !== selectedAddress">check</mat-icon>{{identity.name}}
+      <mat-chip *ngIf="identity.isImport" class="import-chip">IMP</mat-chip>
+    </button>
+  </ng-container>
+</mat-menu>

@@ -1,0 +1,65 @@
+<h2 fxLayoutAlign="center center">Infomation</h2>
+
+<mat-divider></mat-divider>
+<div fxLayout="column" class="container">
+  <h2>About Mpurse</h2>
+
+  <p>Mpurse is the Monaparty's Chrome extension.</p>
+</div>
+
+<mat-divider></mat-divider>
+<div fxLayout="column" class="container">
+  <h2>About Mpchain</h2>
+
+  <p>Mpchain is the Monaparty's blockchain explorer.</p>
+  <a href="https://mpchain.info" (click)="viewNewTab('https://mpchain.info')">https://mpchain.info</a>
+</div>
+
+<mat-divider></mat-divider>
+<div fxLayout="column" class="container">
+  <h2>Donate</h2>
+
+  <p>MONA or whatever tokens are welcome.</p>
+  <p><a routerLink="/send" [queryParams]="{ to: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt' }">MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt</a></p>
+</div>
+
+
+
+
+<!-- <mat-card class="container">
+  <mat-card-header>
+    <mat-card-title>About Mpurse</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <p>
+      Mpurse is the Monaparty's Chrome extension.
+    </p>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="container">
+  <mat-card-header>
+    <mat-card-title>About Mpchain</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <p>
+      Mpchain is the Monaparty's blockchain explorer.
+    </p>
+    <a href="https://mpchain.info" (click)="viewNewTab('https://mpchain.info')">https://mpchain.info</a>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="container">
+  <mat-card-header>
+    <mat-card-title>Donate</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <p>
+      MONA or whatever tokens are welcome.
+    </p>
+    <p><a routerLink="/send" [queryParams]="{ to: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt' }">MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt</a></p>
+  </mat-card-content>
+</mat-card> -->

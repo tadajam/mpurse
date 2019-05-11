@@ -1,0 +1,17 @@
+h2 {
+  text-align: center;
+}
+
+.container {
+  padding: 0.5rem;
+}
+
+mat-card {
+  margin: 0.5rem;
+  height: 22rem;
+
+  strong {
+    color: red;
+    font-size: 2rem;
+  }
+}

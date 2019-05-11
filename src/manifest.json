@@ -1,0 +1,30 @@
+{
+  "name": "Mpurse",
+  "manifest_version": 2,
+  "description": "Monaparty",
+  "version": "0.0.1",
+  "icons": {
+    "16": "assets/mpchain16.png",
+    "48": "assets/mpchain48.png",
+    "128": "assets/mpchain128.png"
+  },
+  "background": {
+    "scripts": ["extension_scripts/background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_title": "Mpurse",
+    "default_icon": {
+      "19": "assets/mpchain19.png"
+    },
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "file://*/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
