@@ -22,7 +22,7 @@ Inject an instance of Mpurse into a Window object.
 
 #### updateEmitter: EventEmitter
 
-
+Exposes an EventEmitter that emits two events: `stateChanged` and `addressChanged`.
 
 ```javascript
 window.mpurse.updateEmitter.removeAllListeners()
@@ -45,7 +45,7 @@ window.mpurse.updateEmitter.removeAllListeners()
   - Need Approve
 
 - Return value
-  - *address*: Promise\<string\>
+  - **address**: Promise\<string\>
 
 ```javascript
 const address = await window.mpurse.getAddress();
@@ -59,14 +59,14 @@ const address = await window.mpurse.getAddress();
 
 - Parameters
 
-  - to: string
-  - asset: string
-  - amount: number
-  - memoType: string ['no' | 'hex' | 'plain']
-  - memoValue: string
+  - **to**: string
+  - **asset**: string
+  - **amount**: number
+  - **memoType**: string ['no' | 'hex' | 'plain']
+  - **memoValue**: string
 
 - Return value
-  - *txHash*: Promise\<string\>
+  - **txHash**: Promise\<string\>
 
 ```javascript
 const txHash = await window.mpurse.sendAsset(
@@ -85,10 +85,10 @@ const txHash = await window.mpurse.sendAsset(
   - Need Manual Execution
 
 - Parameters
-  - tx: string
+  - **tx**: string
 
 - Return value
-  - *signedTx*: Promise\<string\>
+  - **signedTx**: Promise\<string\>
 
 ```javascript
 const signedTx = await window.mpurse.signRawTransaction(tx);
@@ -100,10 +100,10 @@ const signedTx = await window.mpurse.signRawTransaction(tx);
   - Need Manual Execution
 
 - Parameters
-  - personalMessage: string
+  - **personalMessage**: string
 
 - Return value
-  - *signature*: Promise\<string\>
+  - **signature**: Promise\<string\>
 
 ```javascript
 const signature = await window.mpurse.signMessage('Test Message');
@@ -115,15 +115,14 @@ const signature = await window.mpurse.signMessage('Test Message');
   - Need Manual Execution
 
 - Parameters
-  - tx: string
+  - **tx**: string
 
 - Return value
-  - *txHash*: Promise\<string\>
+  - **txHash**: Promise\<string\>
 
 ```javascript
 const txHash = await window.mpurse.sendRawTransaction(tx);
 ```
-
 
 #### mpchain()
 
@@ -133,8 +132,8 @@ Valid methods are `address`, `asset` , `balance` , `balances` , `bets` , `block`
 
 For details, see the [document](https://mpchain.info/doc).
 - Parameters
-  - method: string
-  - params: {  
+  - **method**: string
+  - **params**: {  
       address?: string;  
       asset?: string;  
       block?: number;  
@@ -148,7 +147,7 @@ For details, see the [document](https://mpchain.info/doc).
     }
 
 - Return value
-  - *result*: Promise\<any\>
+  - **result**: Promise\<any\>
 
 ```javascript
 const mpchainParams = {address: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt'};
@@ -160,11 +159,11 @@ const balance = await window.mpurse.mpchain('balances', mpchainParams);
 Counterblock API. (via https://mpchain.info/api/cb)
 
 - Parameters
-  - method: string
-  - params: any
+  - **method**: string
+  - **params**: any
 
 - Return value
-  - *result*: Promise\<any\>
+  - **result**: Promise\<any\>
 
 ```javascript
 const cbParams = {assetsList: ['XMP']};
@@ -176,11 +175,11 @@ const assets = await window.mpurse.counterBlock('get_assets_info', cbParams);
 Counterparty API. (via https://mpchain.info/api/cb)
 
 - Parameters
-  - method: string
-  - params: any
+  - **method**: string
+  - **params**: any
 
 - Return value
-  - *result*: Promise\<any\>
+  - **result**: Promise\<any\>
 
 ```javascript
 const cpParams = {address: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt'};
