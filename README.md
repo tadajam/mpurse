@@ -1,27 +1,187 @@
 # Mpurse
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.2.
+Chrome extension for Monaparty.
 
-## Development server
+# Basic Usage
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Via Browser Action
 
-## Code scaffolding
+- Generate Passphrase
+- Import Passphrase
+- Import Private Key
+- Balance
+- Send
+- Sign Message
+- Sign Transaction
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Via Content Script
 
-## Build
+Inject an instance of Mpurse into a Window object.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### Properties
 
-## Running unit tests
+#### updateEmitter: EventEmitter
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Exposes an EventEmitter that emits two events: `stateChanged` and `addressChanged`.
 
-## Running end-to-end tests
+```javascript
+window.mpurse.updateEmitter.removeAllListeners()
+  .on('stateChanged', isUnlocked => console.log(isUnlocked))
+  .on('addressChanged', address => console.log(address));
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### Methods
 
-## Further help
+- Permission
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+  Need Approve (Permission required for each origin)
+  
+  Need Manual Execution (Operations that require a signature)
+
+
+#### getAddress()
+
+- Permission
+  - Need Approve
+
+- Return value
+  - **address**: Promise\<string\>
+
+```javascript
+const address = await window.mpurse.getAddress();
+```
+
+#### sendAsset()
+
+- Permission
+  - Need Approve
+  - Need Manual Execution
+
+- Parameters
+
+  - **to**: string
+  - **asset**: string
+  - **amount**: number
+  - **memoType**: string ['no' | 'hex' | 'plain']
+  - **memoValue**: string
+
+- Return value
+  - **txHash**: Promise\<string\>
+
+```javascript
+const txHash = await window.mpurse.sendAsset(
+  'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt',
+  'XMP', 
+  114.514, 
+  'plain',
+  'test'
+);
+```
+
+#### signRawTransaction()
+
+- Permission
+  - Need Approve
+  - Need Manual Execution
+
+- Parameters
+  - **tx**: string
+
+- Return value
+  - **signedTx**: Promise\<string\>
+
+```javascript
+const signedTx = await window.mpurse.signRawTransaction(tx);
+```
+#### signMessage()
+
+- Permission
+  - Need Approve
+  - Need Manual Execution
+
+- Parameters
+  - **personalMessage**: string
+
+- Return value
+  - **signature**: Promise\<string\>
+
+```javascript
+const signature = await window.mpurse.signMessage('Test Message');
+```
+#### sendRawTransaction()
+
+- Permission
+  - Need Approve
+  - Need Manual Execution
+
+- Parameters
+  - **tx**: string
+
+- Return value
+  - **txHash**: Promise\<string\>
+
+```javascript
+const txHash = await window.mpurse.sendRawTransaction(tx);
+```
+
+#### mpchain()
+
+Mpchain API.
+
+Valid methods are `address`, `asset` , `balance` , `balances` , `bets` , `block` , `broadcasts` , `btcpays` , `burns` , `dividends` , `history` , `holders` , `issuances` , `market` , `markets` , `market_history` , `market_orderbook` , `market_orders` , `mempool` , `network` , `orders` , `order_matches` , `sends` , `send_tx` and `tx`.
+
+For details, see the [document](https://mpchain.info/doc).
+- Parameters
+  - **method**: string
+  - **params**: {  
+      address?: string;  
+      asset?: string;  
+      block?: number;  
+      tx_index?: number;  
+      tx_hash?: string;  
+      tx_hex?: string;  
+      base_asset?: string;  
+      quote_asset?: string;  
+      page?: number;  
+      limit?: number;  
+    }
+
+- Return value
+  - **result**: Promise\<any\>
+
+```javascript
+const mpchainParams = {address: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt'};
+const balance = await window.mpurse.mpchain('balances', mpchainParams);
+```
+
+#### counterBlock()
+
+Counterblock API. (via https://mpchain.info/api/cb)
+
+- Parameters
+  - **method**: string
+  - **params**: any
+
+- Return value
+  - **result**: Promise\<any\>
+
+```javascript
+const cbParams = {assetsList: ['XMP']};
+const assets = await window.mpurse.counterBlock('get_assets_info', cbParams);
+```
+
+#### counterParty()
+
+Counterparty API. (via https://mpchain.info/api/cb)
+
+- Parameters
+  - **method**: string
+  - **params**: any
+
+- Return value
+  - **result**: Promise\<any\>
+
+```javascript
+const cpParams = {address: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt'};
+const unspentTxouts = await window.mpurse.counterParty('get_unspent_txouts', cpParams);
+```
