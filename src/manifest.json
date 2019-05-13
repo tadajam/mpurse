@@ -1,7 +1,7 @@
 {
   "name": "Mpurse",
   "manifest_version": 2,
-  "description": "Monaparty",
+  "description": "Chrome extension for Monaparty",
   "version": "0.0.1",
   "icons": {
     "16": "assets/mpchain16.png",
