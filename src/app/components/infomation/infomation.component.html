@@ -20,7 +20,10 @@
   <h2>Donate</h2>
 
   <p>MONA or whatever tokens are welcome.</p>
-  <p><a routerLink="/send" [queryParams]="{ to: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt' }">MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt</a></p>
+  <div *ngIf="isUnlocked; then unlocked; else locked"></div>
+  <ng-template #unlocked><p><a routerLink="/send" [queryParams]="{ to: 'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt' }">MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt</a></p></ng-template>
+  <ng-template #locked><p>MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt</p></ng-template>
+  
 </div>
 
 

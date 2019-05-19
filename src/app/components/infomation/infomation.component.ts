@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BackgroundService } from '../../services/background.service';
 
 @Component({
   selector: 'app-infomation',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class InfomationComponent implements OnInit {
 
-  constructor() { }
+  isUnlocked = false;
+
+  constructor(
+    private backgroundService: BackgroundService
+  ) { }
 
   ngOnInit() {
+    this.backgroundService.isUnlocked()
+      .subscribe(isUnlocked => this.isUnlocked = isUnlocked);
   }
 
   viewNewTab(url: string) {
