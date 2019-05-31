@@ -1,13 +1,26 @@
 {
   "name": "Mpurse",
   "manifest_version": 2,
-  "description": "Chrome extension for Monaparty",
-  "version": "0.0.3",
+  "description": "Extension for Monaparty",
+  "version": "0.1.0",
   "icons": {
     "16": "assets/mpchain16.png",
     "48": "assets/mpchain48.png",
     "128": "assets/mpchain128.png"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "extension_scripts/contentscript.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
   "background": {
     "scripts": ["extension_scripts/background.js"],
     "persistent": false
@@ -21,10 +34,6 @@
   },
   "permissions": [
     "storage",
-    "activeTab",
-    "file://*/*",
-    "http://*/*",
-    "https://*/*"
-  ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+    "activeTab"
+  ]
 }

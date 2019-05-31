@@ -31,7 +31,6 @@ class ContentScript {
 
     window.addEventListener('message', (event: MessageEvent) => {
       if (event.origin === window.location.origin && event.data.action) {
-      // if ((event.origin === window.location.origin || window.location.origin === 'file://') && event.data.action) {
         const data = this.isAlive ? event.data.message : {error: 'Extension context invalidated'};
         if (this.isAlive) {
           this.port.postMessage({type: this.getRequestType(event.data.action), id: event.data.id, origin: event.origin, data: data});

@@ -45,6 +45,13 @@ interface Request {
   data: any;
 }
 
+enum Platform {
+  PLATFORM_CHROME,
+  PLATFORM_FIREFOX,
+  PLATFORM_EDGE,
+  PLATFORM_OPERA
+}
+
 class Background {
 
   private version = 1;
@@ -69,43 +76,18 @@ class Background {
   }
 
   assignEventHandlers(): void {
-    chrome.tabs.onUpdated.addListener((tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-      if ('status' in changeInfo && changeInfo.status === 'complete') {
-        if (tab.url) {
-          this.existsVault().then(exists => {
-            if (exists) {
-              chrome.tabs.executeScript(tabId, {file : 'extension_scripts/contentscript.js'}, error => {
-                if (chrome.runtime.lastError) {
-                  console.log(chrome.runtime.lastError.message);
-                }
-              });
-            }
-          });
-        }
-      }
-    });
-
     chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
       if (port.name === ContentScriptMessage.PortName) {
         port.onMessage.addListener((message: any, connectedPort: chrome.runtime.Port) => {
           switch (message.type) {
             case ContentScriptMessage.InPageContent:
-              chrome.runtime.getPackageDirectoryEntry((directoryEntry: DirectoryEntry) => {
-                directoryEntry.getDirectory('extension_scripts', {create: false} , (targetDirectory: DirectoryEntry) => {
-                  targetDirectory.getFile('inpage.js', {create: false}, (inpageFile: FileEntry) => {
-                    inpageFile.file(file => {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        connectedPort.postMessage({
-                          type: message.type,
-                          script: reader.result
-                        });
-                      };
-                      reader.readAsText(file);
-                    });
+              this.readAsTextInpage()
+                .then(script => {
+                  connectedPort.postMessage({
+                    type: message.type,
+                    script: script
                   });
                 });
-              });
               break;
 
             case ContentScriptMessage.InPageInit:
@@ -159,9 +141,34 @@ class Background {
       }
     });
 
-    chrome.runtime.onSuspend.addListener(() => {
-      chrome.browserAction.setBadgeText({text: ''});
-    });
+    if (this.getPlatform() === Platform.PLATFORM_CHROME || this.getPlatform() === Platform.PLATFORM_OPERA) {
+      chrome.runtime.onSuspend.addListener(() => {
+        chrome.browserAction.setBadgeText({text: ''});
+      });
+    }
+  }
+
+  async readAsTextInpage(): Promise<string> {
+    const inpage = await fetch(chrome.runtime.getURL('extension_scripts/inpage.js'), { method: 'GET' });
+    return await inpage.text();
+  }
+
+  private getPlatform(): Platform {
+    const ua = navigator.userAgent;
+    if (ua.search('Firefox') !== -1) {
+      return Platform.PLATFORM_FIREFOX;
+    } else {
+      // if (window && window.chrome && window.chrome.ipcRenderer) {
+      //   return Platform.PLATFORM_BRAVE;
+      // } else
+      if (ua.search('Edge') !== -1) {
+        return Platform.PLATFORM_EDGE;
+      } else if (ua.search('OPR') !== -1) {
+        return Platform.PLATFORM_OPERA;
+      } else {
+      return Platform.PLATFORM_CHROME;
+      }
+    }
   }
 
   async send(tx: string): Promise<any> {
@@ -191,7 +198,6 @@ class Background {
   private popup(): void {
     chrome.windows.create({
       url: 'index.html',
-      focused : true,
       type: 'popup',
       width: 375,
       height: 636
