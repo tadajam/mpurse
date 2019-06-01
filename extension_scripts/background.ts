@@ -33,7 +33,6 @@ interface Preferences {
     isImport: boolean
   }[];
   selectedAddress: string;
-  // isPrivacyModeEnabled: boolean;
 }
 
 interface Request {

@@ -8,15 +8,9 @@ import { InPageMessage } from './enum/inPageMessage';
 import { EventEmitter } from 'events';
 
 class Mpurse {
-
-  private addressListener;
-
   updateEmitter: EventEmitter;
 
   constructor() {
-    this.addressListener =
-      this.createListener(InPageMessage.AddressState, false, 0, m => this.updateEmitter.emit('addressChanged', m.data.address));
-
     this.updateEmitter = new EventEmitter();
     this.init();
   }
@@ -42,6 +36,7 @@ class Mpurse {
     const id = Math.random();
     this.onMessage(InPageMessage.InitResponse, true, id, message => {
       this.onMessage(InPageMessage.LoginState, false, 0, m => this.updateEmitter.emit('stateChanged', m.data.isUnlocked));
+      this.onMessage(InPageMessage.AddressState, false, 0, m => this.updateEmitter.emit('addressChanged', m.data.address));
       this.updateEmitter.emit('stateChanged', message.data.isUnlocked);
     });
     window.postMessage({action: InPageMessage.InitRequest, id: id, message: null}, '*');
@@ -56,9 +51,6 @@ class Mpurse {
         if (message.data.error) {
           reject(message.data.error);
         } else {
-          window.removeEventListener('message', this.addressListener);
-          window.addEventListener('message', this.addressListener);
-          this.updateEmitter.emit('addressChanged', message.data.address);
           resolve(message.data.address);
          }
       });
