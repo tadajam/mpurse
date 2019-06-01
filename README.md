@@ -1,13 +1,13 @@
 # Mpurse
 
-Chrome extension for Monaparty.
+Extension for Monaparty.
 
 # Basic Usage
 
 ## Via Browser Action
 
-- Generate Passphrase
-- Import Passphrase
+- Generate Passphrase(Electrum Seed Version 1, e.g. counterwallet)
+- Import Passphrase(Electrum Seed Version 1, e.g. counterwallet)
 - Import Private Key
 - Balance
 - Send
