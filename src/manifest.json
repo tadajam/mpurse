@@ -4,9 +4,9 @@
   "description": "Extension for Monaparty",
   "version": "0.1.0",
   "icons": {
-    "16": "assets/mpchain16.png",
-    "48": "assets/mpchain48.png",
-    "128": "assets/mpchain128.png"
+    "16": "assets/mpurse16.png",
+    "48": "assets/mpurse48.png",
+    "128": "assets/mpurse128.png"
   },
   "content_scripts": [
     {
@@ -28,7 +28,7 @@
   "browser_action": {
     "default_title": "Mpurse",
     "default_icon": {
-      "19": "assets/mpchain19.png"
+      "19": "assets/mpurse19.png"
     },
     "default_popup": "index.html"
   },
