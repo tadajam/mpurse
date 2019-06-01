@@ -179,7 +179,7 @@ export class MpchainUtil {
     return this.mp('mempool', {address: address, page: page, limit: limit});
   }
 
-  static sendTx(tx_hex: string): Promise<string> {
+  static sendTx(tx_hex: string): Promise<any> {
     return this.mp('send_tx', {tx_hex: tx_hex});
   }
 

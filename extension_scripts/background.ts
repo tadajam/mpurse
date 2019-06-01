@@ -190,7 +190,7 @@ class Background {
     return this.keyring.signMessage(message, this.preferences.selectedAddress);
   }
 
-  async sendRawTransaction(tx: string): Promise<string> {
+  async sendRawTransaction(tx: string): Promise<any> {
     const hex = await this.keyring.signTransaction(tx, this.preferences.selectedAddress);
     return MpchainUtil.sendTx(hex);
   }

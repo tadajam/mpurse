@@ -36,25 +36,15 @@ export class BackgroundService {
       .pipe(map(bg => bg.getIsUnlocked()));
   }
 
-  // isPrivacyModeEnabled(): Observable<boolean> {
-  //   return this.getBackground()
-  //     .pipe(map(bg => bg.isPrivacyModeEnabled()));
-  // }
-
-  // setPrivacyMode(isPrivacyModeEnabled: boolean): Observable<void> {
-  //   return this.getBackground()
-  //     .pipe(flatMap(bg => bg.setPrivacyMode(isPrivacyModeEnabled)));
-  // }
-
   register(password: string): Observable<void> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.unlock(password)));
+      .pipe(flatMap(bg => from<Observable<void>>(bg.unlock(password))));
   }
 
   unlock(password: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.unlock(password))),
+        flatMap(bg => from<Observable<void>>(bg.unlock(password))),
         tap(() => this.updateState())
       );
   }
@@ -74,7 +64,7 @@ export class BackgroundService {
 
   setAccountName(address: string, name: string): Observable<void> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.setAccountName(address, name)));
+      .pipe(flatMap(bg => from<Observable<void>>(bg.setAccountName(address, name))));
   }
 
   getIdentities(): Observable<{address: string, name: string, isImport: boolean}[]> {
@@ -85,7 +75,7 @@ export class BackgroundService {
   changeAddress(address: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.setSelectedAddress(address))),
+        flatMap(bg => from<Observable<void>>(bg.setSelectedAddress(address))),
         tap(() => this.changeAddressState(address))
       );
   }
@@ -93,7 +83,7 @@ export class BackgroundService {
   saveNewPassphrase(passphrase: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.saveNewPassphrase(passphrase))),
+        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase))),
         tap(() => this.updateState())
       );
   }
@@ -108,7 +98,7 @@ export class BackgroundService {
   createAccount(name: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.createAccount(name))),
+        flatMap(bg => from<Observable<void>>(bg.createAccount(name))),
         tap(() => this.updateState())
       );
   }
@@ -116,7 +106,7 @@ export class BackgroundService {
   importAccount(privatekey: string, name: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.importAccount(privatekey, name))),
+        flatMap(bg => from<Observable<void>>(bg.importAccount(privatekey, name))),
         tap(() => this.updateState())
       );
   }
@@ -135,12 +125,12 @@ export class BackgroundService {
 
   shiftRequest(isSuccessful: boolean, id: number, result: any): Observable<void> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.shiftRequest(isSuccessful, id, result)));
+      .pipe(flatMap(bg => from<Observable<void>>(bg.shiftRequest(isSuccessful, id, result))));
   }
 
   signRawTransaction(tx: string): Observable<string> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.signRawTransaction(tx)));
+      .pipe(flatMap(bg => from<Observable<string>>(bg.signRawTransaction(tx))));
   }
 
   signMessage(message: string): Observable<string> {
@@ -150,7 +140,7 @@ export class BackgroundService {
 
   sendRawTransaction(tx: string): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.sendRawTransaction(tx)));
+      .pipe(flatMap(bg => from<Observable<any>>(bg.sendRawTransaction(tx))));
   }
 
   approveOrigin(origin: string, id: number): Observable<boolean> {
@@ -161,7 +151,7 @@ export class BackgroundService {
   removeAccount(address: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.removeAccount(address))),
+        flatMap(bg => from<Observable<void>>(bg.removeAccount(address))),
         tap(() => this.updateState())
       );
   }
@@ -174,23 +164,23 @@ export class BackgroundService {
   purgeAll(): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from(bg.purgeAll())),
+        flatMap(bg => from<Observable<void>>(bg.purgeAll())),
         tap(() => this.updateState())
       );
   }
 
   existsVault(): Observable<boolean> {
-    return this.getBackground().pipe(flatMap(bg => bg.existsVault()));
+    return this.getBackground().pipe(flatMap(bg => from<Observable<boolean>>(bg.existsVault())));
   }
 
   getAddressInfo(address: string): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.getAddressInfo(address)));
+      .pipe(flatMap(bg => from<Observable<any>>(bg.getAddressInfo(address))));
   }
 
   getAsset(asset: string): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.getAsset(asset)));
+      .pipe(flatMap(bg => from<Observable<any>>(bg.getAsset(asset))));
   }
 
   getAccountSummary(address: string): Observable<any> {
@@ -205,7 +195,7 @@ export class BackgroundService {
             isImport = identity.isImport;
           }
 
-          return bg.getAddressInfo(address);
+          return from<Observable<any>>(bg.getAddressInfo(address));
         }),
         map(addressInfo => {
           addressInfo['name'] = name;
@@ -234,18 +224,19 @@ export class BackgroundService {
 
   getBalances(address: string, page: number, limit: number): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.getBalances(address, page, limit)));
+      .pipe(flatMap(bg => from<Observable<any>>(bg.getBalances(address, page, limit))));
   }
 
   createSend(source: string, destination: string, asset: string,
     quantity: number, memo: string, memo_is_hex: boolean, fee_per_kb: number, disableUtxoLocks: boolean): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.createSend(source, destination, asset, quantity, memo, memo_is_hex, fee_per_kb, disableUtxoLocks)));
+      .pipe(flatMap(bg => from<Observable<any>>(
+        bg.createSend(source, destination, asset, quantity, memo, memo_is_hex, fee_per_kb, disableUtxoLocks))));
   }
 
   send(tx: string): Observable<any> {
     return this.getBackground()
-      .pipe(flatMap(bg => bg.send(tx)));
+      .pipe(flatMap(bg => from<Observable<any>>(bg.send(tx))));
   }
 
   updateState(): void {
