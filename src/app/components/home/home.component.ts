@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, NgZone, AfterViewInit, EventEmitter, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { BackgroundService } from '../../services/background.service';
 import { MatDialog, MatDialogConfig, MatBottomSheet, MatSnackBar } from '@angular/material';
 import { Decimal } from 'decimal.js';
@@ -78,14 +78,33 @@ export class HomeComponent implements OnInit, OnDestroy {
     private router: Router,
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService
-  ) { }
+  ) {
+    this.subscriptions.add(
+      this.router.events
+        .pipe(
+          filter(event => event instanceof NavigationEnd),
+          flatMap(() => this.backgroundService.getSelectedAddress()),
+          filter(address => this.accountSummary.address === '' || address === this.accountSummary.address),
+          flatMap(address => this.backgroundService.getAccountSummary(address))
+        )
+        .subscribe({
+          next: accountSummary => {
+            this.zone.run(() => {
+              this.accountSummary = accountSummary;
+              this.page = 1;
+              this.getBalances(0);
+            });
+          },
+          error: error => {
+            this.zone.run(() => {
+              this.snackBar.open(error.toString(), '', {duration: 3000});
+            });
+          }
+        })
+    );
+  }
 
   ngOnInit() {
-    // this.backgroundService.excutePendingRequests()
-    //   .pipe(
-    //     flatMap(() => this.backgroundService.getPendingRequest()),
-    //     filter(request => request)
-    //   )
     this.backgroundService.getPendingRequest()
       .pipe(filter(request => request))
       .subscribe(request => {
@@ -122,23 +141,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           }
         })
     );
-
-    this.backgroundService.getSelectedAddress()
-      .pipe(flatMap(address => this.backgroundService.getAccountSummary(address)))
-      .subscribe({
-        next: accountSummary => {
-          this.zone.run(() => {
-            this.accountSummary = accountSummary;
-            this.page = 1;
-            this.getBalances(0);
-          });
-        },
-        error: error => {
-          this.zone.run(() => {
-            this.snackBar.open(error.toString(), '', {duration: 3000});
-          });
-        }
-      });
   }
 
   ngOnDestroy() {
@@ -218,20 +220,4 @@ export class HomeComponent implements OnInit, OnDestroy {
   isDivisible(quantity: string): boolean {
     return quantity.includes('.');
   }
-
-  // newTab() {
-  //   chrome.tabs.create({
-  //     url: 'index.html'
-  //   });
-  // }
-
-  // popup() {
-  //   chrome.windows.create({
-  //     url: 'index.html',
-  //     focused : true,
-  //     type: 'popup',
-  //     width: 375,
-  //     height: 636
-  //   });
-  // }
 }
