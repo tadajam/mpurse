@@ -2,6 +2,16 @@
 
 Extension for Monaparty.
 
+# Pre-built packages
+
+Available at
+
+* Chrome Web Store
+  * https://chrome.google.com/webstore/detail/mpurse/ljkohnccmlcpleonoiabgfggnhpkihaa
+
+* Firefox add-ons
+  * https://addons.mozilla.org/firefox/addon/mpchain_mpurse/
+
 # Basic Usage
 
 ## Via Browser Action
