@@ -301,7 +301,7 @@ export class SendComponent implements OnInit {
           flatMap(result => this.backgroundService.shiftRequest(true, this.id, {txHash: result.tx_hash}))
         )
         .subscribe({
-          next: () => window.close(),
+          next: () => this.backgroundService.closeWindow(),
           error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
         });
     } else {
@@ -331,7 +331,7 @@ export class SendComponent implements OnInit {
     if (this.request) {
       this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
         .subscribe({
-          next: () => window.close(),
+          next: () => this.backgroundService.closeWindow(),
           error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
         });
     } else {

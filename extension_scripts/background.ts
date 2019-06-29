@@ -48,7 +48,8 @@ enum Platform {
   PLATFORM_CHROME,
   PLATFORM_FIREFOX,
   PLATFORM_EDGE,
-  PLATFORM_OPERA
+  PLATFORM_OPERA,
+  PLATFORM_FIREFOX_ANDROID
 }
 
 class Background {
@@ -93,7 +94,8 @@ class Background {
               connectedPort.onDisconnect.addListener((initPort: chrome.runtime.Port) => {
                 this.connectedPorts = this.connectedPorts.filter(cp => cp.port.sender.id !== initPort.sender.id);
                 this.requests = this.requests.filter(r => r.port.sender.id !== initPort.sender.id);
-                chrome.browserAction.setBadgeText({text: this.requests.length === 0 ? '' : this.requests.length.toString()});
+
+                this.setBadgeText(false);
               });
               this.connectedPorts.push({port: connectedPort, origin: message.origin});
 
@@ -142,8 +144,14 @@ class Background {
 
     if (this.getPlatform() === Platform.PLATFORM_CHROME || this.getPlatform() === Platform.PLATFORM_OPERA) {
       chrome.runtime.onSuspend.addListener(() => {
-        chrome.browserAction.setBadgeText({text: ''});
+        this.setBadgeText(true);
       });
+    }
+  }
+
+  setBadgeText(shouldDelete: boolean): void {
+    if (this.getPlatform() !== Platform.PLATFORM_FIREFOX_ANDROID) {
+      chrome.browserAction.setBadgeText({text: shouldDelete || this.requests.length === 0 ? '' : this.requests.length.toString()});
     }
   }
 
@@ -155,7 +163,11 @@ class Background {
   private getPlatform(): Platform {
     const ua = navigator.userAgent;
     if (ua.search('Firefox') !== -1) {
-      return Platform.PLATFORM_FIREFOX;
+      if (ua.search('Android') !== -1) {
+        return Platform.PLATFORM_FIREFOX_ANDROID;
+      } else {
+        return Platform.PLATFORM_FIREFOX;
+      }
     } else {
       // if (window && window.chrome && window.chrome.ipcRenderer) {
       //   return Platform.PLATFORM_BRAVE;
@@ -195,12 +207,16 @@ class Background {
   }
 
   private popup(): void {
-    chrome.windows.create({
-      url: 'index.html',
-      type: 'popup',
-      width: 375,
-      height: 636
-    });
+    if (this.getPlatform() === Platform.PLATFORM_FIREFOX_ANDROID) {
+      chrome.tabs.create({url: 'index.html'});
+    } else {
+      chrome.windows.create({
+        url: 'index.html',
+        type: 'popup',
+        width: 375,
+        height: 636
+      });
+    }
   }
 
   private setRequest(target: string, port: chrome.runtime.Port, message: any): void {
@@ -213,7 +229,7 @@ class Background {
       data: message.data
     });
 
-    chrome.browserAction.setBadgeText({text: this.requests.length.toString()});
+    this.setBadgeText(false);
     this.popup();
   }
 
@@ -264,7 +280,8 @@ class Background {
       if (rb[i].target === '' && this.isApprovedOrigin(rb[i].origin)) {
         this.executeRequest(rb[i].port, rb[i]);
         this.requests = this.requests.filter(r => r.id.toString() !== rb[i].id.toString());
-        chrome.browserAction.setBadgeText({text: this.requests.length === 0 ? '' : this.requests.length.toString()});
+
+        this.setBadgeText(false);
       }
     }
   }
@@ -321,7 +338,8 @@ class Background {
       });
 
       this.requests = this.requests.filter(r => r.id.toString() !== id.toString());
-      chrome.browserAction.setBadgeText({text: this.requests.length === 0 ? '' : this.requests.length.toString()});
+
+      this.setBadgeText(false);
     }
   }
 
@@ -335,11 +353,8 @@ class Background {
   }
 
   isApprovedOrigin(origin: string): boolean {
-    // if (this.isPrivacyModeEnabled()) {
     return this.approvedOrigins.some(approved => approved === origin);
-    // } else {
     return true;
-    // }
   }
 
   private broadcastUpdate(type: ContentScriptMessage, data: any): void {
@@ -368,7 +383,6 @@ class Background {
     this.preferences = {
       identities: [],
       selectedAddress: '',
-      // isPrivacyModeEnabled: true
     };
     this.broadcastUpdate(ContentScriptMessage.AddressState, {address: ''});
   }

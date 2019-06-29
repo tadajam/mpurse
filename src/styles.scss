@@ -26,11 +26,13 @@ $mpurse-theme: mat-light-theme($mpurse-primary, $mpurse-accent, $mpurse-warn);
 // that you are using.
 @include angular-material-theme($mpurse-theme);
 
-body {
-  width: 357px;
-  height: 600px;
+@media (min-device-width: 900px) {
+  body {
+    width: 357px;
+    height: 600px;
+  }
 }
-// html, body { height: 100%; }
+
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .break-all {

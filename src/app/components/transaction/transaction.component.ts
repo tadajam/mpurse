@@ -93,14 +93,14 @@ export class TransactionComponent implements OnInit {
         this.backgroundService.sendRawTransaction(this.rawControl.value)
           .pipe(flatMap(result => this.backgroundService.shiftRequest(true, this.id, {txHash: result.tx_hash})))
           .subscribe({
-            next: () => window.close(),
+            next: () => this.backgroundService.closeWindow(),
             error: error => this.zone.run(() => this.snackBar.open(this.backgroundService.interpretError(error), '', {duration: 3000}))
           });
       } else {
         this.backgroundService.signRawTransaction(this.rawControl.value)
           .pipe(flatMap(signedTx => this.backgroundService.shiftRequest(true, this.id, {signedTx: signedTx})))
           .subscribe({
-            next: () => window.close(),
+            next: () => this.backgroundService.closeWindow(),
             error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
           });
       }
@@ -117,23 +117,12 @@ export class TransactionComponent implements OnInit {
     if (this.request) {
       this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
         .subscribe({
-          next: () => window.close(),
+          next: () => this.backgroundService.closeWindow(),
           error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
         });
     } else {
       this.zone.run(() => this.router.navigate(['/home']));
     }
-    // this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
-    //   .subscribe({
-    //     next: () => {
-    //       if (this.request) {
-    //         window.close();
-    //       } else {
-    //         this.zone.run(() => this.router.navigate(['/home']));
-    //       }
-    //     },
-    //     error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-    //   });
   }
 
 }

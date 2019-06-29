@@ -90,8 +90,7 @@ export class SignatureComponent implements OnInit {
       this.backgroundService.signMessage(this.messageControl.value)
         .pipe(flatMap(signature => this.backgroundService.shiftRequest(true, this.id, {signature: signature})))
         .subscribe({
-          // next: () => this.zone.run(() => this.router.navigate(['/home'])),
-          next: () => window.close(),
+          next: () => this.backgroundService.closeWindow(),
           error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
         });
     } else {
@@ -107,23 +106,12 @@ export class SignatureComponent implements OnInit {
     if (this.request) {
       this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
       .subscribe({
-        next: () => window.close(),
+        next: () => this.backgroundService.closeWindow(),
         error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
       });
     } else {
       this.zone.run(() => this.router.navigate(['/home']));
     }
-    // this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
-    //   .subscribe({
-    //     next: () => {
-    //       if (this.request) {
-    //         window.close();
-    //       } else {
-    //         this.zone.run(() => this.router.navigate(['/home']));
-    //       }
-    //     },
-    //     error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-    //   });
   }
 
 }

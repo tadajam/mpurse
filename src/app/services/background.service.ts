@@ -262,6 +262,16 @@ export class BackgroundService {
     this.identitiesSubject.next(identities);
   }
 
+  closeWindow(): void {
+    chrome.tabs.getCurrent(tab => {
+      if (tab) {
+        chrome.tabs.remove(tab.id);
+      } else {
+        window.close();
+      }
+    });
+  }
+
   generateRandomMnemonic(): Observable<string> {
     return this.getBackground()
       .pipe(map(bg => bg.keyring.generateRandomMnemonic()));

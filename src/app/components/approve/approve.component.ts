@@ -46,7 +46,7 @@ export class ApproveComponent implements OnInit {
           if (hasNext) {
             this.zone.run(() => this.router.navigate(['/home']));
           } else {
-            window.close();
+            this.backgroundService.closeWindow();
           }
         },
         error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
@@ -56,7 +56,7 @@ export class ApproveComponent implements OnInit {
   cancel(): void {
     this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
       .subscribe({
-        next: () => window.close(),
+        next: () => this.backgroundService.closeWindow(),
         error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
       });
   }
