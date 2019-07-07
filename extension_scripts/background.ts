@@ -33,6 +33,7 @@ interface Preferences {
     isImport: boolean
   }[];
   selectedAddress: string;
+  isAdvancedModeEnabled: boolean;
 }
 
 interface Request {
@@ -54,7 +55,7 @@ enum Platform {
 
 class Background {
 
-  private version = 1;
+  private version = 2;
   private isUnlocked = false;
   private password: string;
   private preferences: Preferences;
@@ -354,7 +355,6 @@ class Background {
 
   isApprovedOrigin(origin: string): boolean {
     return this.approvedOrigins.some(approved => approved === origin);
-    return true;
   }
 
   private broadcastUpdate(type: ContentScriptMessage, data: any): void {
@@ -383,6 +383,7 @@ class Background {
     this.preferences = {
       identities: [],
       selectedAddress: '',
+      isAdvancedModeEnabled: false
     };
     this.broadcastUpdate(ContentScriptMessage.AddressState, {address: ''});
   }
@@ -405,8 +406,14 @@ class Background {
           if (items.vault.checksum === EncryptUtil.createCheckSum(pw)) {
             this.password = pw;
             this.isUnlocked = true;
-            // version check
-            // if (items.version)
+
+            // version 1 > version 2
+            if (items.version === 1) {
+              if (! items.preferences.hasOwnProperty('isAdvancedModeEnabled')) {
+                items.preferences.isAdvancedModeEnabled = false;
+              }
+            }
+
             this.preferences = items.preferences;
             this.deserializeKeyring(items.vault.data);
             resolve();
@@ -434,14 +441,14 @@ class Background {
     return this.isUnlocked;
   }
 
-  // isPrivacyModeEnabled(): boolean {
-  //   return this.preferences.isPrivacyModeEnabled;
-  // }
+  isAdvancedModeEnabled(): boolean {
+    return this.preferences.isAdvancedModeEnabled;
+  }
 
-  // setPrivacyMode(isPM: boolean): Promise<void> {
-  //   this.preferences.isPrivacyModeEnabled = isPM;
-  //   return this.updateState();
-  // }
+  setAdvancedMode(isEnabled: boolean): Promise<void> {
+    this.preferences.isAdvancedModeEnabled = isEnabled;
+    return this.updateState();
+  }
 
   createKeyring(passphrase: string, numberOfAccounts: number, privatekeys: string[]): void {
     this.keyring = new Keyring();

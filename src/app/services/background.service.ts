@@ -161,6 +161,16 @@ export class BackgroundService {
       .pipe(map(bg => bg.incrementAccountName(name, num)));
   }
 
+  isAdvancedModeEnabled(): Observable<boolean> {
+    return this.getBackground()
+      .pipe(map(bg => bg.isAdvancedModeEnabled()));
+  }
+
+  setAdvancedMode(isEnabled: boolean): Observable<void> {
+    return this.getBackground()
+      .pipe(flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled))));
+  }
+
   purgeAll(): Observable<void> {
     return this.getBackground()
       .pipe(

@@ -15,7 +15,7 @@ export class SettingsComponent implements OnInit {
   existsVault = false;
   isUnlocked = false;
 
-  privacyToggleControl = new FormControl(false, [Validators.required]);
+  advancedModeToggleControl = new FormControl(false, [Validators.required]);
 
   hide = true;
   passwordControl = new FormControl('', [Validators.required]);
@@ -34,19 +34,21 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
     this.backgroundService.isUnlocked()
       .subscribe(isUnlocked => this.isUnlocked = isUnlocked);
+
     this.backgroundService.existsVault()
       .subscribe(existsVault => this.existsVault = existsVault);
-    // this.backgroundService.isPrivacyModeEnabled()
-    //   .subscribe(isPrivacyModeEnabled => this.privacyToggleControl.setValue(isPrivacyModeEnabled));
+
+    this.backgroundService.isAdvancedModeEnabled()
+      .subscribe(isAdvancedModeEnabled => this.advancedModeToggleControl.setValue(isAdvancedModeEnabled));
   }
 
-  // privacyModeChanged(): void {
-  //   this.backgroundService.setPrivacyMode(this.privacyToggleControl.value)
-  //     .subscribe({
-  //       next: error => this.zone.run(() => this.snackBar.open('The settings have been changed.', '', {duration: 3000})),
-  //       error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-  //     });
-  // }
+  advancedModeChanged(): void {
+    this.backgroundService.setAdvancedMode(this.advancedModeToggleControl.value)
+      .subscribe({
+        next: () => this.zone.run(() => this.snackBar.open('The settings have been changed.', '', {duration: 3000})),
+        error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+      });
+  }
 
   revealPassphrase() {
     this.backgroundService.getPassphrase(this.passwordControl.value)

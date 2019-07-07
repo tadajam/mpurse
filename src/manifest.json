@@ -2,7 +2,7 @@
   "name": "Mpurse",
   "manifest_version": 2,
   "description": "Extension for Monaparty",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "icons": {
     "16": "assets/mpurse16.png",
     "48": "assets/mpurse48.png",
@@ -31,11 +31,6 @@
     },
     "default_popup": "index.html"
   },
-  // "browser_specific_settings": {
-  //   "gecko": {
-  //     "id": "mpurse@mpchain.info"
-  //   }
-  // },
   "permissions": [
     "storage",
     "activeTab"

@@ -18,6 +18,8 @@ export class SendComponent implements OnInit {
   id = 0;
   origin = '';
 
+  isAdvancedModeEnabled = false;
+
   hasAssignedTo = false;
   hasAssignedAsset = false;
   hasAssignedAmount = false;
@@ -64,7 +66,7 @@ export class SendComponent implements OnInit {
   }, {validators: this.memoValidator});
 
   assetControl = new FormControl('MONA', [Validators.required]);
-  feeControl = new FormControl(201, [Validators.required, Validators.min(101)]);
+  feeControl = new FormControl(101, [Validators.required, Validators.min(10)]);
 
   sendForm = new FormGroup({
     from: this.fromControl,
@@ -155,22 +157,6 @@ export class SendComponent implements OnInit {
         });
       });
 
-    // this.route.queryParams
-    //   .pipe(filter(params => params.to || params.amount || params.asset))
-    //   .subscribe(params => {
-    //     if (params.to) {
-    //       this.toControl.setValue(params.to);
-    //     }
-
-    //     if (params.amount) {
-    //       this.amountControl.setValue(params.amount);
-    //     }
-
-    //     if (params.asset) {
-    //       this.assetControl.setValue(params.asset);
-    //     }
-    //   });
-
     this.backgroundService.getSelectedAddress()
       .pipe(
         flatMap(address => this.backgroundService.getAccountSummary(address)),
@@ -212,6 +198,9 @@ export class SendComponent implements OnInit {
         }),
         filter(() => this.sendForm.valid),
       ).subscribe(() => this.createSend());
+
+    this.backgroundService.isAdvancedModeEnabled()
+      .subscribe(isAdvancedModeEnabled => this.isAdvancedModeEnabled = isAdvancedModeEnabled);
   }
 
   getAvailable(asset: string): string {

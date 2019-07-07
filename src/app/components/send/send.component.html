@@ -54,11 +54,19 @@
     <mat-form-field fxFlex="auto">
       <input matInput type="number" placeholder="Fee Watanabes/Byte" formControlName="fee" required />
     </mat-form-field>
-    <div fxLayoutAlign="center center">
-      <button mat-flat-button type="button" (click)="feeControl.setValue(101)">SLOW</button>
-      <button mat-flat-button type="button" (click)="feeControl.setValue(201)">FAST</button>
-    </div>
 
+    <div *ngIf="isAdvancedModeEnabled; then advancedModeEnabled; else advancedModeDisabled"></div>
+
+    <ng-template #advancedModeEnabled>
+      <mat-slider min="10" max="200" thumbLabel="true" [value]="feeControl.value" (input)="feeControl.setValue($event.value)"></mat-slider>
+    </ng-template>
+
+    <ng-template #advancedModeDisabled>
+      <div fxLayoutAlign="center center">
+        <button mat-flat-button type="button" (click)="feeControl.setValue(101)">SLOW</button>
+        <button mat-flat-button type="button" (click)="feeControl.setValue(201)">FAST</button>
+      </div>
+    </ng-template>
   </div>
 
   <div class="result-div">
