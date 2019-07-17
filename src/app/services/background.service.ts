@@ -80,10 +80,10 @@ export class BackgroundService {
       );
   }
 
-  saveNewPassphrase(passphrase: string): Observable<void> {
+  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase))),
+        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase, seedVersion, basePath))),
         tap(() => this.updateState())
       );
   }

@@ -65,7 +65,7 @@ export class GenerateComponent implements OnInit {
   }
 
   savePassphrase(): void {
-    this.backgroundService.saveNewPassphrase(this.passphraseControl.value)
+    this.backgroundService.saveNewPassphrase(this.passphraseControl.value, 'Electrum1', 'm/0\'/0/')
       .subscribe({
         next: () => this.zone.run(() => this.router.navigate(['/home'])),
         error: error => {

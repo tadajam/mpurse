@@ -1,14 +1,12 @@
 import * as Mnemonic from './external/mnemonic.js';
-import * as Bip39 from 'bip39';
 import * as BitCore from 'bitcore-lib';
 import * as BitCoreMessage from 'bitcore-message';
-import * as CryptoJS from 'crypto-js';
 import { MpchainUtil } from './util.mpchain';
 
 export class BitcoreUtil {
 
   NETWORK;
-  basePath = 'm/0\'/0/';
+  // basePath = 'm/0\'/0/';
   // 'm/44\'/22\'/0\'/0/'
 
   constructor() {
@@ -81,18 +79,21 @@ export class BitcoreUtil {
     return mnemonic.join(' ');
   }
 
-  // generateRandomBip39Mnemonic(): string {
-  //   return Bip39.generateMnemonic();
-  // }
-
-  getHDPrivateKey(passphrase: string): BitCore.PrivateKey {
-    const words = passphrase.toLowerCase().split(' ');
-    const seed = new Mnemonic(words).toHex();
-    return BitCore.HDPrivateKey.fromSeed(seed, this.NETWORK);
+  getHDPrivateKey(passphrase: string, seedVersion: string): BitCore.PrivateKey {
+    switch (seedVersion) {
+      case 'Electrum1':
+        const words = passphrase.toLowerCase().split(' ');
+        const seed = new Mnemonic(words).toHex();
+        return BitCore.HDPrivateKey.fromSeed(seed, this.NETWORK);
+      case 'Electrum2':
+        break;
+      case 'BIP39':
+        break;
+    }
   }
 
-  getPrivateKey(hDPrivateKey: BitCore.PrivateKey, index: number): BitCore.PrivateKey {
-    return hDPrivateKey.derive(this.basePath + index).privateKey;
+  getPrivateKey(hDPrivateKey: BitCore.PrivateKey, basePath: string, index: number): BitCore.PrivateKey {
+    return hDPrivateKey.derive(basePath + index).privateKey;
   }
 
   getPrivateKeyFromHex(hex: string): BitCore.PrivateKey {
@@ -207,17 +208,5 @@ export class BitcoreUtil {
       }),
       threshold: threshold
     };
-  }
-
-  // encrypt(message: string, password: string): string {
-  //   return CryptoJS.AES.encrypt(message, password).toString();
-  // }
-
-  // decrypt(cryptedMessage: string, password: string): string {
-  //   return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(cryptedMessage, password));
-  // }
-
-  createCheckSum(password: string): string {
-    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
   }
 }

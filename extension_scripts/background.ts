@@ -10,7 +10,8 @@ declare global {
 
 interface VaultData {
   hdkey: {
-    hdPath: string,
+    seedVersion: string,
+    basePath: string,
     mnemonic: string,
     numberOfAccounts: number
   };
@@ -55,7 +56,7 @@ enum Platform {
 
 class Background {
 
-  private version = 2;
+  private version = 3;
   private isUnlocked = false;
   private password: string;
   private preferences: Preferences;
@@ -409,13 +410,19 @@ class Background {
 
             // version 1 > version 2
             if (items.version === 1) {
-              if (! items.preferences.hasOwnProperty('isAdvancedModeEnabled')) {
-                items.preferences.isAdvancedModeEnabled = false;
-              }
+              items.preferences.isAdvancedModeEnabled = false;
+            }
+
+            const key = JSON.parse(EncryptUtil.decrypt(items.vault.data, this.password));
+
+            // version 2 > version 3
+            if (items.version <= 2) {
+              key.hdkey.seedVersion = 'Electrum1';
+              key.hdkey.basePath = 'm/0\'/0/';
             }
 
             this.preferences = items.preferences;
-            this.deserializeKeyring(items.vault.data);
+            this.createKeyring(key.hdkey.mnemonic, key.hdkey.seedVersion, key.hdkey.basePath, key.hdkey.numberOfAccounts, key.privatekeys);
             resolve();
           } else {
             this.resetPassword();
@@ -450,9 +457,9 @@ class Background {
     return this.updateState();
   }
 
-  createKeyring(passphrase: string, numberOfAccounts: number, privatekeys: string[]): void {
+  createKeyring(passphrase: string, seedVersion: string, basePath: string, numberOfAccounts: number, privatekeys: string[]): void {
     this.keyring = new Keyring();
-    this.keyring.deserialize(passphrase, numberOfAccounts, privatekeys);
+    this.keyring.deserialize(passphrase, seedVersion, basePath, numberOfAccounts, privatekeys);
 
     const accounts = this.keyring.getAccounts();
     for (let i = 0; i < accounts.length; i++) {
@@ -474,11 +481,6 @@ class Background {
         isImport: isImport
       });
     }
-  }
-
-  deserializeKeyring(data: string): void {
-    const key = JSON.parse(EncryptUtil.decrypt(data, this.password));
-    this.createKeyring(key.hdkey.mnemonic, key.hdkey.numberOfAccounts, key.privatekeys);
   }
 
   private saveState(data: VaultData): Promise<void> {
@@ -507,11 +509,11 @@ class Background {
     return this.saveState(this.keyring.serialize());
   }
 
-  saveNewPassphrase(passphrase: string): Promise<void> {
+  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string): Promise<void> {
     if (this.password !== '') {
       this.isUnlocked = true;
     }
-    this.createKeyring(passphrase, 1, []);
+    this.createKeyring(passphrase, seedVersion, basePath, 1, []);
 
     return this.updateState();
   }
