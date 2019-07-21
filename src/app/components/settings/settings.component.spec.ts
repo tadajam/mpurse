@@ -1,6 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SettingsComponent } from './settings.component';
+import {
+  MatDividerModule,
+  MatSlideToggleModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatButtonModule,
+  MatSnackBarModule,
+  MatInputModule
+} from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('SettingsComponent', () => {
   let component: SettingsComponent;
@@ -8,7 +22,22 @@ describe('SettingsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SettingsComponent ]
+      imports: [
+        MatDividerModule,
+        MatSlideToggleModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatIconModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        RouterTestingModule,
+        BrowserAnimationsModule,
+      ],
+      declarations: [ SettingsComponent ],
     })
     .compileComponents();
   }));
