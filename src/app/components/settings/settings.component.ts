@@ -19,6 +19,8 @@ export class SettingsComponent implements OnInit {
 
   hide = true;
   passwordControl = new FormControl('', [Validators.required]);
+  seedVersion = '';
+  basePath = '';
   passphrase = '';
 
   canPurgeAll = new FormControl('', [Validators.required]);
@@ -50,12 +52,16 @@ export class SettingsComponent implements OnInit {
       });
   }
 
-  revealPassphrase() {
-    this.backgroundService.getPassphrase(this.passwordControl.value)
+  revealPassphrase(): void {
+    this.backgroundService.getHdkey(this.passwordControl.value)
       .subscribe(
-        passphrase => {
-          if (passphrase !== '') {
-            this.zone.run(() => this.passphrase = passphrase);
+        hdkey => {
+          if (hdkey) {
+            this.zone.run(() => {
+              this.seedVersion = hdkey.seedVersion;
+              this.basePath = hdkey.basePath;
+              this.passphrase = hdkey.mnemonic;
+            });
             this.passwordControl.setValue('');
           } else {
             this.passphrase = '';

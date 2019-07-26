@@ -52,6 +52,10 @@ export class Keyring {
     return this.hdkey.mnemonic;
   }
 
+  getHdkey(): Hdkey {
+    return this.hdkey;
+  }
+
   getPrivatekey(address: string): string {
       const account = this.accounts.find(value => value.address === address);
       let wif = '';
@@ -112,8 +116,8 @@ export class Keyring {
     return this.accounts.some(value => value.privatekey === this.bitcore.getPrivateKeyFromWIF(wif).toString());
   }
 
-  generateRandomMnemonic(): string {
-    return this.bitcore.generateRandomMnemonic();
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
+    return this.bitcore.generateRandomMnemonic(seedVersion, seedLanguage);
   }
 
   decodeBase58(address: string): Uint8Array {

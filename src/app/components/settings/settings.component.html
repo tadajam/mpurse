@@ -9,7 +9,7 @@
 </div>
 
 <mat-divider></mat-divider>
-<div fxLayout="column" class="container">
+<div *ngIf="existsVault" fxLayout="column" class="container">
   <h2>Reveal Passphrase</h2>
 
   <form fxLayout="column">
@@ -26,11 +26,17 @@
         </strong>
       </p>
 
-      <mat-card class="passphrase" fxLayout="row">
-        <p fxFlex="auto">{{passphrase}}</p>
-        <button mat-icon-button (click)="copyPassphrase()">
-          <mat-icon>file_copy</mat-icon>
-        </button>
+      <mat-card class="passphrase">
+        <mat-card-header *ngIf="this.advancedModeToggleControl.value">
+          <mat-card-title>Seed Version: {{seedVersion}}</mat-card-title>
+          <mat-card-subtitle>Derivation Path: {{basePath}}i</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content fxLayout="row">
+          <p fxFlex="auto">{{passphrase}}</p>
+          <button mat-icon-button (click)="copyPassphrase()">
+            <mat-icon>file_copy</mat-icon>
+          </button>
+        </mat-card-content>
       </mat-card>
     </ng-container>
 
@@ -40,7 +46,7 @@
 </div>
 
 <mat-divider></mat-divider>
-<div fxLayout="column" class="container">
+<div *ngIf="existsVault" fxLayout="column" class="container">
   <h2>Purge All Accounts</h2>
 
   <p class="attention">
@@ -54,70 +60,3 @@
     <button mat-stroked-button fxFlex="auto" color="primary" (click)="purgeAll()" [disabled]="!canPurgeAll.valid">Purge</button>
   </form>
 </div>
-
-<!-- <mat-card *ngIf="isUnlocked" class="container">
-  <mat-card-header>
-    <mat-card-title>Privacy Mode</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <mat-slide-toggle color="primary" [formControl]="privacyToggleControl" (change)="privacyModeChanged()">
-      Privacy Mode
-    </mat-slide-toggle>
-  </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="isUnlocked" class="container">
-  <mat-card-header>
-    <mat-card-title>Reveal Passphrase</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <form fxLayout="column">
-      <mat-form-field *ngIf="! passphrase" class="password-field">
-        <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="Enter Password" [formControl]="passwordControl" />
-        <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
-      </mat-form-field>
-
-      <ng-container *ngIf="passphrase">
-        <p class="attention">
-          <strong>
-            DO NOT share this phrase with anyone!
-            These words can be used to steal all your accounts.
-          </strong>
-        </p>
-
-        <mat-card class="passphrase" fxLayout="row">
-          <p fxFlex="auto">{{passphrase}}</p>
-          <button mat-icon-button (click)="copyPassphrase()">
-            <mat-icon>file_copy</mat-icon>
-          </button>
-        </mat-card>
-      </ng-container>
-
-      <button mat-stroked-button *ngIf="! passphrase" fxFlex="auto" color="primary" (click)="revealPassphrase()" [disabled]="!passwordControl.valid">Reveal Passphrase</button>
-
-    </form>
-  </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="existsValut" class="container">
-  <mat-card-header>
-    <mat-card-title>Purge All Accounts</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <p class="attention">
-      <strong>
-        All account and settings will be removed from your wallet.
-        Please make sure you have the original seed phrase before continuing.
-      </strong>
-    </p>
-    <form fxLayout="column">
-      <mat-checkbox class="purge-check" [formControl]="canPurgeAll" required>Purge all</mat-checkbox>
-      <button mat-stroked-button fxFlex="auto" color="primary" (click)="purgeAll()" [disabled]="!canPurgeAll.valid">Purge</button>
-    </form>
-  </mat-card-content>
-</mat-card> -->
-
-

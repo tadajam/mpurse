@@ -95,6 +95,13 @@ export class BackgroundService {
       );
   }
 
+  getHdkey(password: string): Observable<any> {
+    return this.getBackground()
+      .pipe(
+        map(bg => bg.getHdkey(password))
+      );
+  }
+
   createAccount(name: string): Observable<void> {
     return this.getBackground()
       .pipe(
@@ -218,7 +225,7 @@ export class BackgroundService {
       return this.getBackground()
         .pipe(
           map(bg => {
-            const bytes = bg.keyring.decodeBase58(address);
+            const bytes = bg.decodeBase58(address);
             let hex = '';
             for (let i = 0; i < bytes.length; i++) {
               if (bytes[i] < 16) {
@@ -282,19 +289,14 @@ export class BackgroundService {
     });
   }
 
-  generateRandomMnemonic(): Observable<string> {
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): Observable<string> {
     return this.getBackground()
-      .pipe(map(bg => bg.keyring.generateRandomMnemonic()));
+      .pipe(map(bg => bg.generateRandomMnemonic(seedVersion, seedLanguage)));
   }
-
-  // generateRandomBip39Mnemonic(): Observable<string> {
-  //   return this.getBackground()
-  //     .pipe(map(bg => bg.bitcore.generateRandomBip39Mnemonic()));
-  // }
 
   decodeBase58(str: string): Observable<Uint8Array> {
     return this.getBackground()
-      .pipe(map(bg => bg.keyring.decodeBase58(str)));
+      .pipe(map(bg => bg.decodeBase58(str)));
   }
 
   interpretError(error: any): string {

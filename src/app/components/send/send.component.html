@@ -31,7 +31,7 @@
   <div formGroupName="memo" *ngIf="assetControl.value !== 'MONA'">
     <mat-form-field class="full-width">
       <mat-label>Memo Type</mat-label>
-      <mat-select *ngIf="! hasAssignedMemoType" formControlName="memoType"required>
+      <mat-select *ngIf="! hasAssignedMemoType" formControlName="memoType" required>
         <mat-option value="no">No memo</mat-option>
         <mat-option value="hex">Data memo</mat-option>
         <mat-option value="plain">Plain text memo</mat-option>

@@ -12,7 +12,7 @@
       <ng-template matTabContent>
         <p>Get Your Passphrase</p>
         <mat-form-field class="full-width">
-          <textarea matInput readonly="true" formControlName="passphrase" required></textarea>
+          <textarea matInput matTextareaAutosize readonly="true" formControlName="passphrase" required></textarea>
           <mat-icon matSuffix (click)="generateRandomMnemonic()">refresh</mat-icon>
         </mat-form-field>
       </ng-template>
@@ -35,6 +35,28 @@
       </ng-template>
     </mat-tab>
   </mat-tab-group>
+
+  <mat-form-field *ngIf="isAdvancedModeEnabled" class="full-width">
+    <mat-label>Seed Version</mat-label>
+    <mat-select formControlName="seedVersion" (selectionChange)="versionChanged()" required>
+      <mat-option *ngFor="let v of seedVersions" [value]="v">
+        {{ v }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <mat-form-field *ngIf="isAdvancedModeEnabled && seedVersionControl.value === 'Bip39' && isGenerate" class="full-width">
+    <mat-label>Seed Language</mat-label>
+    <mat-select formControlName="seedLanguage" (selectionChange)="generateRandomMnemonic()" required>
+      <mat-option *ngFor="let lang of languages" [value]="lang">
+        {{ lang }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <mat-form-field *ngIf="isAdvancedModeEnabled" class="full-width">
+    <textarea matInput placeholder="Base Derivation Path" formControlName="basePath" required></textarea>
+  </mat-form-field>
 
   <label fxLayout="row">
     <mat-checkbox fxLayoutAlign="center center" formControlName="isSaved" required></mat-checkbox>

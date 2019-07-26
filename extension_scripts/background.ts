@@ -454,7 +454,12 @@ class Background {
 
   setAdvancedMode(isEnabled: boolean): Promise<void> {
     this.preferences.isAdvancedModeEnabled = isEnabled;
-    return this.updateState();
+
+    if (! this.isUnlocked) {
+      return Promise.resolve();
+    } else {
+      return this.updateState();
+    }
   }
 
   createKeyring(passphrase: string, seedVersion: string, basePath: string, numberOfAccounts: number, privatekeys: string[]): void {
@@ -509,6 +514,14 @@ class Background {
     return this.saveState(this.keyring.serialize());
   }
 
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
+    return this.keyring.generateRandomMnemonic(seedVersion, seedLanguage);
+  }
+
+  decodeBase58(str: string): Uint8Array {
+    return this.keyring.decodeBase58(str);
+  }
+
   saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string): Promise<void> {
     if (this.password !== '') {
       this.isUnlocked = true;
@@ -524,6 +537,14 @@ class Background {
       passphrase = this.keyring.getPassphrase();
     }
     return passphrase;
+  }
+
+  getHdkey(password: string): string {
+    let hdkey = null;
+    if (password === this.password) {
+      hdkey = this.keyring.getHdkey();
+    }
+    return hdkey;
   }
 
   getPrivatekey(password: string, address: string): string {
