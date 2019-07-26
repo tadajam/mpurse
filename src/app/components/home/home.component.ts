@@ -202,15 +202,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   viewMpchain(): void {
-    chrome.tabs.create({
-      url: 'https://mpchain.info/address/' + this.accountSummary.address
-    });
+    this.backgroundService.viewNewTab('https://mpchain.info/address/' + this.accountSummary.address);
   }
 
   viewInsight(): void {
-    chrome.tabs.create({
-      url: 'https://mona.insight.monaco-ex.org/insight/address/' + this.accountSummary.address
-    });
+    this.backgroundService.viewNewTab('https://mona.insight.monaco-ex.org/insight/address/' + this.accountSummary.address);
   }
 
   reflectUnconfirmed(confirmed: string, unconfirmed: string): number {

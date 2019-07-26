@@ -67,9 +67,7 @@ export class DetailsComponent implements OnInit {
   }
 
   viewMpchain() {
-    chrome.tabs.create({
-      url: 'https://mpchain.info/address/' + this.address
-    });
+    this.backgroundService.viewNewTab('https://mpchain.info/address/' + this.address);
   }
 
   copyPrivatekey() {

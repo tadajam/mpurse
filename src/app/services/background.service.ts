@@ -239,6 +239,10 @@ export class BackgroundService {
         );
   }
 
+  viewNewTab(url: string): void {
+    chrome.tabs.create({url: url});
+  }
+
   getBalances(address: string, page: number, limit: number): Observable<any> {
     return this.getBackground()
       .pipe(flatMap(bg => from<Observable<any>>(bg.getBalances(address, page, limit))));

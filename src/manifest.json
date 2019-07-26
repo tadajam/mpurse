@@ -31,11 +31,6 @@
     },
     "default_popup": "index.html"
   },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "mpurse@mpchain.info"
-    }
-  },
   "permissions": [
     "storage",
     "activeTab"
