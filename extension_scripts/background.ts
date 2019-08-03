@@ -35,6 +35,7 @@ interface Preferences {
   }[];
   selectedAddress: string;
   isAdvancedModeEnabled: boolean;
+  lang: string;
 }
 
 interface Request {
@@ -56,7 +57,7 @@ enum Platform {
 
 class Background {
 
-  private version = 3;
+  private version = 4;
   private isUnlocked = false;
   private password: string;
   private preferences: Preferences;
@@ -381,10 +382,13 @@ class Background {
   }
 
   private resetPreferences(): void {
+    const isAdvanced = this.preferences && this.preferences.isAdvancedModeEnabled ? this.preferences.isAdvancedModeEnabled : false;
+    const lang = this.preferences && this.preferences.lang ? this.preferences.lang : null;
     this.preferences = {
       identities: [],
       selectedAddress: '',
-      isAdvancedModeEnabled: false
+      isAdvancedModeEnabled: isAdvanced,
+      lang: lang
     };
     this.broadcastUpdate(ContentScriptMessage.AddressState, {address: ''});
   }
@@ -410,7 +414,7 @@ class Background {
 
             // version 1 > version 2
             if (items.version === 1) {
-              items.preferences.isAdvancedModeEnabled = false;
+              items.preferences.isAdvancedModeEnabled = this.preferences.isAdvancedModeEnabled;
             }
 
             const key = JSON.parse(EncryptUtil.decrypt(items.vault.data, this.password));
@@ -421,8 +425,14 @@ class Background {
               key.hdkey.basePath = 'm/0\'/0/';
             }
 
+            // version 3 > version 4
+            if (items.version <= 3) {
+                items.preferences.lang = 'en';
+            }
+
             this.preferences = items.preferences;
-            this.createKeyring(key.hdkey.mnemonic, key.hdkey.seedVersion, key.hdkey.basePath, key.hdkey.numberOfAccounts, key.privatekeys);
+            this.createKeyring(key.hdkey.mnemonic, key.hdkey.seedVersion, key.hdkey.basePath,
+                key.hdkey.numberOfAccounts, key.privatekeys, null);
             resolve();
           } else {
             this.resetPassword();
@@ -456,19 +466,68 @@ class Background {
     this.preferences.isAdvancedModeEnabled = isEnabled;
 
     if (! this.isUnlocked) {
-      return Promise.resolve();
+      return this.updatePreferences();
     } else {
       return this.updateState();
     }
   }
 
-  createKeyring(passphrase: string, seedVersion: string, basePath: string, numberOfAccounts: number, privatekeys: string[]): void {
+  getLang(): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      chrome.storage.local.get(['preferences'], items => {
+        if ('preferences' in items) {
+          if ('lang' in items.preferences) {
+            resolve(items.preferences.lang);
+          } else {
+            resolve('en');
+          }
+        } else {
+          if (this.preferences.lang) {
+            resolve(this.preferences.lang);
+          } else {
+            resolve(null);
+          }
+        }
+      });
+    });
+  }
+
+  setLang(lang: string): Promise<void> {
+    this.preferences.lang = lang;
+
+    if (! this.isUnlocked) {
+      return this.updatePreferences();
+    } else {
+      return this.updateState();
+    }
+  }
+
+  updatePreferences(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      chrome.storage.local.get(['preferences'], items => {
+        if ('preferences' in items) {
+          items.preferences.lang = this.preferences.lang;
+          items.preferences.isAdvancedModeEnabled = this.preferences.isAdvancedModeEnabled;
+
+          chrome.storage.local.set({preferences: items.preferences}, () => {
+            resolve();
+          });
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  createKeyring(passphrase: string, seedVersion: string, basePath: string,
+      numberOfAccounts: number, privatekeys: string[], baseName: string): void {
     this.keyring = new Keyring();
     this.keyring.deserialize(passphrase, seedVersion, basePath, numberOfAccounts, privatekeys);
 
+    const name = baseName ? baseName : 'Account';
     const accounts = this.keyring.getAccounts();
     for (let i = 0; i < accounts.length; i++) {
-      const accountName = this.incrementAccountName('Account ', this.preferences.identities.length + 1);
+      const accountName = this.incrementAccountName(name, this.preferences.identities.length + 1);
       this.setIdentities(accounts[i].address, accountName, accounts[i].index < 0);
     }
     if (this.preferences.selectedAddress === '') {
@@ -522,11 +581,11 @@ class Background {
     return this.keyring.decodeBase58(str);
   }
 
-  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string): Promise<void> {
+  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string, baseName: string): Promise<void> {
     if (this.password !== '') {
       this.isUnlocked = true;
     }
-    this.createKeyring(passphrase, seedVersion, basePath, 1, []);
+    this.createKeyring(passphrase, seedVersion, basePath, 1, [], baseName);
 
     return this.updateState();
   }
@@ -593,11 +652,11 @@ class Background {
   }
 
   incrementAccountName(name: string, num: number) {
-    while (this.preferences.identities.some(value => value.name === (name + num))) {
+    while (this.preferences.identities.some(value => value.name === (name + ' ' + num))) {
       num++;
     }
 
-    return name + num;
+    return name + ' ' + num;
   }
 
   purgeAll(): Promise<void> {

@@ -1,14 +1,14 @@
-<h2 fxLayoutAlign="center center">Approve Request</h2>
+<h2 fxLayoutAlign="center center">{{ 'approve.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
 <div fxLayout="column" class="container">
-  <h3 fxLayoutAlign="center center">Request from '{{origin}}'</h3>
+  <h3 fxLayoutAlign="center center">{{ 'approve.requestFrom' | translate }}'{{origin}}'</h3>
 
   <form (ngSubmit)="approve()">
     <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
-      <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>Cancel</button>
-      <button mat-stroked-button fxFlex="auto" color="primary">Approve</button>
+      <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>{{ 'approve.cancel' | translate }}</button>
+      <button mat-stroked-button fxFlex="auto" color="primary">{{ 'approve.approve' | translate }}</button>
     </div>
   </form>
 </div>

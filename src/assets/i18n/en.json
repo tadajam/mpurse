@@ -1,0 +1,153 @@
+{
+  "addAccount": {
+    "title": "New Account",
+    "create": "Create",
+    "accountName": "Account Name",
+    "required": "Required",
+    "cancel": "Cancel",
+    "import": "Import",
+    "privatekey": "Private key(WIF)",
+    "attentionImport": "Imported accounts will not be associated with your originally created Mpurse account passphrase.",
+    "account": "Account"
+  },
+  "approve": {
+    "title": "Approve Request",
+    "requestFrom": "Request from ",
+    "cancel": "Cancel",
+    "approve": "Approve"
+  },
+  "details": {
+    "title": "Account Details",
+    "viewMpchain": "View on Mpchain",
+    "enterPassword": "Enter Password",
+    "attentionPrivatekey": "DO NOT share this privatekey with anyone! This can be used to steal your accounts.",
+    "exportPrivatekey": "Export Private Key",
+    "invalidPassword": "Password is invalid",
+    "copied": "Copied"
+  },
+  "generate": {
+    "title": "Passphrase",
+    "generate": "Generate",
+    "generatePassphrase": "Generate Your Passphrase",
+    "import": "Import",
+    "importPassphrase": "Paste Your Passphrase",
+    "required": "Required",
+    "words12": "Must be 12 words.",
+    "seedVersion": "Seed Version",
+    "seedLanguage": "Seed Language",
+    "basePath": "Base Derivation Path",
+    "checkSave": "I have written down or otherwise securely stored my passphrase.",
+    "errorSave": "You should save passphrase.",
+    "save": "Save",
+    "account": "Account"
+  },
+  "home": {
+    "copyClipboard": "Copy to clipboard",
+    "accountDetails": "Account Details",
+    "signMessage": "Sign Message",
+    "signTransaction": "Sign Transaction",
+    "viewMpchain": "View on Mpchain",
+    "viewInsight": "View on insight",
+    "removeAccount": "Remove Account",
+    "copied": "Copied"
+  },
+  "infomation": {
+    "title": "Infomation",
+    "aboutMpurseTitle": "About Mpurse",
+    "aboutMpurse": "Mpurse is open source Monacoin and Monaparty wallet.",
+    "aboutMpchainTitle": "About Mpchain",
+    "aboutMpchain": "Mpchain is a free Monaparty blockchain explorer.",
+    "aboutDonateTitle": "Donate",
+    "aboutDonate": "MONA or whatever tokens are welcome."
+  },
+  "login": {
+    "title": "Unlock Mpurse",
+    "enterPassword": "Enter Password",
+    "unlock": "Unlock"
+  },
+  "menuButton": {
+    "accounts": "Accounts",
+    "lock": "Lock Mpurse",
+    "createAccount": "Create Account",
+    "importAccount": "Import Account",
+    "settings": "Settings",
+    "information": "Information"
+  },
+  "register": {
+    "title": "Register",
+    "encryptPassphrase": "Encrypt your passphrase.",
+    "password": "New Password (min 8 chars)",
+    "char8": "Password must be at least 8 characters.",
+    "confirm": "Confirm Password",
+    "match": "The password and the confirmation you typed do not match.",
+    "create": "Create"
+  },
+  "removeAccount": {
+    "title": "Remove Account",
+    "attentionRemove": "This account will be removed from your wallet. Please make sure you have the original seed phrase or private key for this imported account before continuing.",
+    "cancel": "Cancel",
+    "remove": "Remove"
+  },
+  "send": {
+    "title": "Send",
+    "from": "From",
+    "to": "To Address",
+    "asset": "Send Asset",
+    "amount": "Amount",
+    "available": "Available: ",
+    "memoType": "Memo Type",
+    "no": "No memo",
+    "hex": "Data memo",
+    "plain": "Plain text memo",
+    "invalidMemo": "Invalid memo string",
+    "memo": "Transaction Memo",
+    "fee": "Fee Watanabes/Byte",
+    "slow": "SLOW",
+    "fast": "FAST",
+    "resultFee": "Transaction fee: ",
+    "remaining": "After sending, you will have {{value}} MONA remaining at this address.",
+    "requestFrom": "Request from ",
+    "cancel": "Cancel",
+    "send": "Send",
+    "sent": "Funds sent. tx_hash: "
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "advancedMode": "Advanced Mode",
+    "revealPassphrase": "Reveal Passphrase",
+    "enterPassword": "Enter Password",
+    "attentionPassphrase": "DO NOT share this phrase with anyone! These words can be used to steal all your accounts.",
+    "derivationPath": "Derivation Path",
+    "purgeAccounts": "Purge All Accounts",
+    "attentionPurge": "All account and settings will be removed from your wallet. Please make sure you have the original seed phrase before continuing.",
+    "purgeAll": "Purge all",
+    "purge": "Purge",
+    "settingsChanged": "The settings have been changed."
+  },
+  "signature": {
+    "title": "Signature Message",
+    "message": "Message",
+    "signature": "Signature",
+    "requestFrom": "Request from ",
+    "cancel": "Cancel",
+    "sign": "Sign",
+    "copied": "Copied"
+  },
+  "terms": {
+    "title": "Term of Use",
+    "accept": "Accept"
+  },
+  "transaction": {
+    "titleSend": "Sign And Send Transaction",
+    "titleNotSend": "Sign Transaction",
+    "rawTransaction": "Raw Transaction",
+    "signedTransaction": "Signed Transaction",
+    "requestFrom": "Request from ",
+    "cancel": "Cancel",
+    "send": "Send",
+    "sign": "Sign",
+    "copied": "Copied"
+  }
+}

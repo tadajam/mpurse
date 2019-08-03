@@ -5,6 +5,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material';
 import { BackgroundService } from '../../services/background.service';
 import { filter, tap, flatMap, map } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-transaction',
@@ -36,7 +37,8 @@ export class TransactionComponent implements OnInit {
     private router: Router,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -84,7 +86,7 @@ export class TransactionComponent implements OnInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open('Copied', '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('settings.copied'), '', {duration: 2000});
   }
 
   sign() {

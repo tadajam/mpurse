@@ -1,4 +1,4 @@
-<h2 fxLayoutAlign="center center">Signature Request</h2>
+<h2 fxLayoutAlign="center center">{{ 'signature.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
@@ -15,12 +15,10 @@
 
   <mat-divider></mat-divider>
 
-
-
   <form [formGroup]="signatureForm" (ngSubmit)="sign()" class="signature-form">
 
     <mat-form-field class="full-width">
-      <mat-label>Message</mat-label>
+      <mat-label>{{ 'signature.message' | translate }}</mat-label>
       <textarea matInput
         [readonly]="request"
         cdkTextareaAutosize
@@ -32,7 +30,7 @@
     </mat-form-field>
 
     <mat-form-field class="full-width" *ngIf="! request && signatureControl.value">
-      <mat-label>Signature</mat-label>
+      <mat-label>{{ 'signature.signature' | translate }}</mat-label>
       <textarea matInput
         readonly="true"
         cdkTextareaAutosize
@@ -44,17 +42,12 @@
 
     <ng-container *ngIf="request">
       <mat-divider></mat-divider>
-      <h3 fxLayoutAlign="center center">Request from '{{origin}}'</h3>
+      <h3 fxLayoutAlign="center center">{{ 'signature.requestFrom' | translate }}'{{origin}}'</h3>
     </ng-container>
 
     <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
-      <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>Cancel</button>
-      <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!signatureForm.valid">Sign</button>
+      <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>{{ 'signature.cancel' | translate }}</button>
+      <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!signatureForm.valid">{{ 'signature.sign' | translate }}</button>
     </div>
   </form>
 </div>
-
-
-
-
-

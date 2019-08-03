@@ -7,6 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-details',
@@ -33,7 +34,8 @@ export class DetailsComponent implements OnInit {
     private router: Router,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -83,7 +85,7 @@ export class DetailsComponent implements OnInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open('Copied', '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('details.copied'), '', {duration: 2000});
   }
 
   revealPrivatekey() {
@@ -96,7 +98,7 @@ export class DetailsComponent implements OnInit {
         } else {
           this.privatekey = '';
           this.passwordControl.setValue('');
-          this.zone.run(() => this.snackBar.open('Password is invalid', '', {duration: 3000}));
+          this.zone.run(() => this.snackBar.open(this.translate.instant('details.invalidPassword'), '', {duration: 3000}));
         }
       });
   }

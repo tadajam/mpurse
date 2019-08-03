@@ -22,7 +22,6 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // this.passwordControl.setValue('');
   }
 
   unlock() {

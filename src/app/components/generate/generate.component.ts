@@ -6,6 +6,7 @@ import { MatTabChangeEvent, MatSnackBar } from '@angular/material';
 import { FormGroup, FormControl, Validators, ValidationErrors, AbstractControl } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { BackgroundService } from '../../services/background.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-generate',
@@ -21,7 +22,10 @@ export class GenerateComponent implements OnInit {
   isSavedControl = new FormControl('', [Validators.required]);
 
   seedVersionControl = new FormControl('Electrum1', [Validators.required]);
-  seedVersions = ['Electrum1', 'Bip39'];
+  seedVersions: {versionString: string, versionValue: string}[] = [
+    {versionString: 'Electrum Seed Version 1', versionValue: 'Electrum1'},
+    {versionString: 'Bip39', versionValue: 'Bip39'}
+  ];
   seedLanguageControl = new FormControl('ENGLISH', [Validators.required]);
   languages = ['CHINESE', 'ENGLISH', 'FRENCH', 'ITALIAN', 'JAPANESE', 'KOREAN', 'SPANISH'];
 
@@ -46,7 +50,8 @@ export class GenerateComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -91,7 +96,8 @@ export class GenerateComponent implements OnInit {
   }
 
   savePassphrase(): void {
-    this.backgroundService.saveNewPassphrase(this.passphraseControl.value, this.seedVersionControl.value, this.basePathControl.value)
+    this.backgroundService.saveNewPassphrase(this.passphraseControl.value, this.seedVersionControl.value,
+        this.basePathControl.value, this.translate.instant('generate.account'))
       .subscribe({
         next: () => this.zone.run(() => this.router.navigate(['/home'])),
         error: error => {

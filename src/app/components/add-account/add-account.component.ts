@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map, filter, flatMap, first } from 'rxjs/operators';
 import { BackgroundService } from '../../services/background.service';
 import { MatSnackBar } from '@angular/material';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-account',
@@ -26,7 +27,8 @@ export class AddAccountComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -34,7 +36,7 @@ export class AddAccountComponent implements OnInit {
       .pipe(filter(params => params.selected))
       .subscribe(params => this.selected = params.selected);
 
-    this.backgroundService.incrementAccountName('Account ', 1)
+    this.backgroundService.incrementAccountName(this.translate.instant('addAccount.account'), 1)
       .subscribe(name => this.nameFormControl.setValue(name));
   }
 

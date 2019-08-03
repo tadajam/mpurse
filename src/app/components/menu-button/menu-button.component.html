@@ -7,36 +7,36 @@
 <mat-menu #menu="matMenu">
   <button mat-menu-item [matMenuTriggerFor]="accounts" *ngIf="isUnlocked">
     <mat-icon>account_balance_wallet</mat-icon>
-    <span>Accounts</span>
+    <span>{{ 'menuButton.accounts' | translate }}</span>
   </button>
 
   <button mat-menu-item *ngIf="isUnlocked" (click)="lock()">
     <mat-icon>lock</mat-icon>
-    <span>Lock Mpurse</span>
+    <span>{{ 'menuButton.lock' | translate }}</span>
   </button>
 
   <mat-divider *ngIf="isUnlocked"></mat-divider>
 
   <button mat-menu-item *ngIf="isUnlocked" routerLink="/add" [queryParams]='{ selected: 0 }'>
     <mat-icon>add</mat-icon>
-    <span>Create Account</span>
+    <span>{{ 'menuButton.createAccount' | translate }}</span>
   </button>
 
   <button mat-menu-item *ngIf="isUnlocked" routerLink="/add" [queryParams]='{ selected: 1 }'>
     <mat-icon>input</mat-icon>
-    <span>Import Account</span>
+    <span>{{ 'menuButton.importAccount' | translate }}</span>
   </button>
 
   <mat-divider *ngIf="isUnlocked"></mat-divider>
 
   <button mat-menu-item routerLink="/settings">
     <mat-icon>settings</mat-icon>
-    <span>Settings</span>
+    <span>{{ 'menuButton.settings' | translate }}</span>
   </button>
 
   <button mat-menu-item routerLink="/info">
     <mat-icon>info</mat-icon>
-    <span>Information</span>
+    <span>{{ 'menuButton.information' | translate }}</span>
   </button>
 </mat-menu>
 

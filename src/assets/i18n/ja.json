@@ -1,0 +1,155 @@
+{
+  "addAccount": {
+    "title": "新しいアカウント",
+    "create": "作成",
+    "accountName": "アカウント名",
+    "required": "必須項目",
+    "cancel": "キャンセル",
+    "import": "インポート",
+    "privatekey": "秘密鍵(WIF)",
+    "attentionImport": "インポートしたアカウントは、最初に作成したMpurseアカウントのパスフレーズと関連付けられません。",
+    "account": "アカウント"
+  },
+  "approve": {
+    "title": "リクエストの承認",
+    "requestFrom": "リクエスト元： ",
+    "cancel": "キャンセル",
+    "approve": "承認"
+  },
+  "details": {
+    "title": "アカウント詳細",
+    "viewMpchain": "Mpchainを表示",
+    "enterPassword": "パスワード",
+    "attentionPrivatekey": "この文字列を他人と共有しないでください。これはあなたのアカウントを盗むために使用することができます。",
+    "exportPrivatekey": "秘密鍵を表示",
+    "invalidPassword": "パスワードが一致しません。",
+    "copied": "コピーしました。"
+  },
+  "generate": {
+    "title": "パスフレーズ",
+    "generate": "生成",
+    "generatePassphrase": "パスフレーズを生成する",
+    "import": "インポート",
+    "importPassphrase": "パスフレーズを貼り付ける",
+    "required": "必須項目",
+    "words12": "12単語である必要があります。",
+    "seedVersion": "シードのバージョン",
+    "seedLanguage": "シードの言語",
+    "basePath": "導出パス",
+    "checkSave": "自分のパスフレーズをメモするなど安全な方法でバックアップしました。",
+    "errorSave": "パスフレーズを必ずバックアップして下さい。",
+    "save": "保存",
+    "account": "アカウント"
+  },
+  "home": {
+    "copyClipboard": "コピーする",
+    "accountDetails": "アカウント詳細",
+    "signMessage": "メッセージへ署名",
+    "signTransaction": "トランザクションへ署名",
+    "viewMpchain": "Mpchainを表示",
+    "viewInsight": "insightを表示",
+    "removeAccount": "アカウントを削除",
+    "copied": "コピーしました。"
+  },
+  "infomation": {
+    "title": "情報",
+    "aboutMpurseTitle": "Mpurseとは",
+    "aboutMpurse": "MpurseはオープンソースのMonacoinとMonapartyの財布です。",
+    "aboutMpchainTitle": "Mpchainとは",
+    "aboutMpchain": "Mpchainは無料のMonapartyブロックチェーンエクスプローラです。",
+    "aboutDonateTitle": "寄付",
+    "aboutDonate": "MONAやその他のトークンでも大歓迎です。"
+  },
+  "login": {
+    "title": "Mpurseをアンロック",
+    "enterPassword": "パスワード",
+    "unlock": "アンロック"
+  },
+  "menuButton": {
+    "accounts": "アカウント",
+    "lock": "Mpurseをロック",
+    "createAccount": "アカウントの作成",
+    "importAccount": "アカウントのインポート",
+    "settings": "設定",
+    "information": "情報"
+  },
+  "register": {
+    "title": "登録",
+    "encryptPassphrase": "パスフレーズを暗号化します。",
+    "password": "パスワード(8文字以上)",
+    "char8": "パスワードは8文字以上必要です。",
+    "confirm": "確認入力",
+    "match": "パスワードが一致しません。",
+    "create": "作成"
+  },
+  "removeAccount": {
+    "title": "アカウントを削除",
+    "attentionRemove": "このアカウントはあなたの財布から削除されます。続行する前にこのインポートしたアカウントの元のシードフレーズまたは秘密鍵があることを確認してください。",
+    "cancel": "キャンセル",
+    "remove": "削除"
+  },
+  "send": {
+    "title": "送信",
+    "from": "送信元アドレス",
+    "to": "送信先アドレス",
+    "asset": "アセット",
+    "amount": "送信量",
+    "available": "残高: ",
+    "memoType": "メモタイプ",
+    "no": "メモ無し",
+    "hex": "データ",
+    "plain": "プレーンテキスト",
+    "invalidMemo": "無効なメモ文字列",
+    "memo": "メモ",
+    "fee": "手数料 Watanabes/Byte",
+    "slow": "低速",
+    "fast": "高速",
+    "resultFee": "トランザクション手数料: ",
+    "remaining": "送信後このアドレスに {{value}} MONAが残ります。",
+    "requestFrom": "要求元 ",
+    "cancel": "キャンセル",
+    "send": "送信",
+    "sent": "送信しました。tx_hash: "
+  },
+  "settings": {
+    "title": "設定",
+    "language": "言語",
+    "selectLanguage": "言語を選択",
+    "advancedMode": "アドバンスドモード",
+    "revealPassphrase": "パスフレーズを表示",
+    "enterPassword": "パスワード",
+    "attentionPassphrase": "このフレーズを他人と共有しないでください。これらの言葉はあなたのアカウントを盗むために使用することができます。",
+    "derivationPath": "導出パス",
+    "purgeAccounts": "すべてのアカウントを削除",
+    "attentionPurge": "すべてのアカウントと設定はあなたの財布から削除されます。続行する前に、元のシードフレーズがあることを確認してください。",
+    "purgeAll": "すべて削除します",
+    "purge": "削除",
+    "settingsChanged": "設定は変更されました。",
+    "invalidPassword": "パスワードが一致しません。",
+    "copied": "コピーしました。"
+  },
+  "signature": {
+    "title": "メッセージへ署名",
+    "message": "メッセージ",
+    "signature": "署名",
+    "requestFrom": "要求元 ",
+    "cancel": "キャンセル",
+    "sign": "署名",
+    "copied": "コピーしました。"
+  },
+  "terms": {
+    "title": "利用規約",
+    "accept": "同意"
+  },
+  "transaction": {
+    "titleSend": "トランザクションの送信",
+    "titleNotSend": "トランザクションへ署名",
+    "rawTransaction": "トランザクション",
+    "signedTransaction": "署名済トランザクション",
+    "requestFrom": "要求元 ",
+    "cancel": "キャンセル",
+    "send": "送信",
+    "sign": "署名",
+    "copied": "コピーしました。"
+  }
+}

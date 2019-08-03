@@ -1,58 +1,58 @@
-<h2 fxLayoutAlign="center center">Send</h2>
+<h2 fxLayoutAlign="center center">{{ 'send.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
 <form [formGroup]="sendForm" (ngSubmit)="send()" class="send-form">
 
   <mat-form-field class="full-width">
-    <input matInput readonly="true" placeholder="From" formControlName="from" />
+    <input matInput readonly="true" placeholder="{{ 'send.from' | translate }}" formControlName="from" />
   </mat-form-field>
 
   <mat-form-field class="full-width">
-    <input matInput [readonly]="hasAssignedTo" placeholder="To Address" formControlName="to" required />
+    <input matInput [readonly]="hasAssignedTo" placeholder="{{ 'send.to' | translate }}" formControlName="to" required />
   </mat-form-field>
 
   <mat-form-field class="full-width">
-    <mat-label>Send Asset</mat-label>
+    <mat-label>{{ 'send.asset' | translate }}</mat-label>
     <mat-select *ngIf="! hasAssignedAsset" formControlName="asset">
       <mat-option value="MONA">MONA</mat-option>
       <mat-option *ngFor="let asset of assets" [value]="asset.asset">{{asset.asset_longname ? asset.asset_longname : asset.asset}}</mat-option>
     </mat-select>
-    <input matInput *ngIf="hasAssignedAsset" [readonly]="true" placeholder="Send Asset" formControlName="asset" required />
+    <input matInput *ngIf="hasAssignedAsset" [readonly]="true" placeholder="{{ 'send.asset' | translate }}" formControlName="asset" required />
   </mat-form-field>
 
   <mat-form-field class="full-width">
-    <input matInput [readonly]="hasAssignedAmount" type="text" placeholder="Amount" formControlName="amount" required />
+    <input matInput [readonly]="hasAssignedAmount" type="text" placeholder="{{ 'send.amount' | translate }}" formControlName="amount" required />
     <span mat-button matSuffix *ngIf="! hasAssignedAmount" (click)="setAvailableAllFunds()" class="available-button">
-      Available: {{getAvailable(assetControl.value)}}
+      {{ 'send.available' | translate }}{{getAvailable(assetControl.value)}}
     </span>
   </mat-form-field>
 
   <div formGroupName="memo" *ngIf="assetControl.value !== 'MONA'">
     <mat-form-field class="full-width">
-      <mat-label>Memo Type</mat-label>
+      <mat-label>{{ 'send.memoType' | translate }}</mat-label>
       <mat-select *ngIf="! hasAssignedMemoType" formControlName="memoType" required>
-        <mat-option value="no">No memo</mat-option>
-        <mat-option value="hex">Data memo</mat-option>
-        <mat-option value="plain">Plain text memo</mat-option>
+        <mat-option value="no">{{ 'send.no' | translate }}</mat-option>
+        <mat-option value="hex">{{ 'send.hex' | translate }}</mat-option>
+        <mat-option value="plain">{{ 'send.plain' | translate }}</mat-option>
       </mat-select>
       <div *ngIf="hasAssignedMemoType" [ngSwitch]="memoTypeControl.value">
-        <input matInput *ngSwitchCase="'no'" readonly="true" placeholder="Memo Type" value="No memo" />
-        <input matInput *ngSwitchCase="'hex'" readonly="true" placeholder="Memo Type" value="Data memo" />
-        <input matInput *ngSwitchCase="'plain'" readonly="true" placeholder="Memo Type" value="Plain text memo" />
+        <input matInput *ngSwitchCase="'no'" readonly="true" placeholder="{{ 'send.memoType' | translate }}" value="{{ 'send.no' | translate }}" />
+        <input matInput *ngSwitchCase="'hex'" readonly="true" placeholder="{{ 'send.memoType' | translate }}" value="{{ 'send.hex' | translate }}" />
+        <input matInput *ngSwitchCase="'plain'" readonly="true" placeholder="{{ 'send.memoType' | translate }}" value="{{ 'send.plain' | translate }}" />
       </div>
     </mat-form-field>
 
-    <mat-error *ngIf="memoGroup.invalid">Invalid memo string</mat-error>
+    <mat-error *ngIf="memoGroup.invalid">{{ 'send.invalidMemo' | translate }}</mat-error>
   
     <mat-form-field class="full-width" *ngIf="memoTypeControl.value === 'hex' || memoTypeControl.value === 'plain'">
-      <input matInput [readonly]="hasAssignedMemoValue" placeholder="Transaction Memo" formControlName="memoValue" />
+      <input matInput [readonly]="hasAssignedMemoValue" placeholder="{{ 'send.memo' | translate }}" formControlName="memoValue" />
     </mat-form-field>
   </div>
 
   <div fxLayout="row">
     <mat-form-field fxFlex="auto">
-      <input matInput type="number" placeholder="Fee Watanabes/Byte" formControlName="fee" required />
+      <input matInput type="number" placeholder="{{ 'send.fee' | translate }}" formControlName="fee" required />
     </mat-form-field>
 
     <div *ngIf="isAdvancedModeEnabled; then advancedModeEnabled; else advancedModeDisabled"></div>
@@ -63,34 +63,34 @@
 
     <ng-template #advancedModeDisabled>
       <div fxLayoutAlign="center center">
-        <button mat-flat-button type="button" (click)="feeControl.setValue(101)">SLOW</button>
-        <button mat-flat-button type="button" (click)="feeControl.setValue(201)">FAST</button>
+        <button mat-flat-button type="button" (click)="feeControl.setValue(101)">{{ 'send.slow' | translate }}</button>
+        <button mat-flat-button type="button" (click)="feeControl.setValue(201)">{{ 'send.fast' | translate }}</button>
       </div>
     </ng-template>
   </div>
 
   <div class="result-div">
     <ng-container *ngIf="unsignedTx">
-      <p>Transaction fee: {{calculatedFee / 100000000 | number:'1.8-8'}} MONA</p>
+      <p>{{ 'send.resultFee' | translate }}{{calculatedFee / 100000000 | number:'1.8-8'}} MONA</p>
       <ng-container *ngIf="unsignedTx">
       </ng-container>
       <div *ngIf="assetControl.value === 'MONA'; then thenBlock; else elseBlock"></div>
       <ng-template #thenBlock>
-        After sending, you will have {{(getAvailableNumber(assetControl.value) - amountControl.value - calculatedFee / 100000000) | number:'1.8-8'}} MONA remaining at this address.
+        {{ 'send.remaining' | translate:{value: (getAvailableNumber(assetControl.value) - amountControl.value - calculatedFee / 100000000) | number:'1.8-8'} }}
       </ng-template>
       <ng-template #elseBlock>
-        After sending, you will have {{(getAvailableNumber(assetControl.value) - calculatedFee / 100000000) | number:'1.8-8'}} MONA remaining at this address.
+        {{ 'send.remaining' | translate:{value: (getAvailableNumber('MONA') - calculatedFee / 100000000) | number:'1.8-8'} }}
       </ng-template>
     </ng-container>
   </div>
 
   <ng-container *ngIf="request">
     <mat-divider></mat-divider>
-    <h3 fxLayoutAlign="center center">Request from '{{origin}}'</h3>
+    <h3 fxLayoutAlign="center center">{{ 'send.requestFrom' | translate }}'{{origin}}'</h3>
   </ng-container>
 
   <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
-    <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>Cancel</button>
-    <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="unsignedTx === ''">Send</button>
+    <button mat-stroked-button fxFlex="auto" type="button" (click)=cancel()>{{ 'send.cancel' | translate }}</button>
+    <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="unsignedTx === ''">{{ 'send.send' | translate }}</button>
   </div>
 </form>

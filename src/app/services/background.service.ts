@@ -3,6 +3,7 @@ import { Subject, Observable, throwError, from } from 'rxjs';
 import { map, filter, flatMap, first, tap } from 'rxjs/operators';
 import { SafeHtml } from '@angular/platform-browser';
 import * as jazzicon from 'jazzicon';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class BackgroundService {
   private identitiesSubject = new Subject<{address: string, name: string, isImport: boolean}[]>();
   identitiesState = this.identitiesSubject.asObservable();
 
-  constructor() {}
+  constructor(private translate: TranslateService) {}
 
   private getBackground(): Observable<any> {
     return Observable.create(observer => {
@@ -80,10 +81,10 @@ export class BackgroundService {
       );
   }
 
-  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string): Observable<void> {
+  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string, baseName: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase, seedVersion, basePath))),
+        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase, seedVersion, basePath, baseName))),
         tap(() => this.updateState())
       );
   }
@@ -176,6 +177,22 @@ export class BackgroundService {
   setAdvancedMode(isEnabled: boolean): Observable<void> {
     return this.getBackground()
       .pipe(flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled))));
+  }
+
+  getLang(): Observable<string> {
+    return this.getBackground()
+      .pipe(
+        flatMap(bg => from<Observable<string>>(bg.getLang())),
+        map(l => {
+          let lang = l || this.translate.getBrowserLang();
+          lang = /(en|ja)/gi.test(lang) ? lang : 'en';
+          return lang;
+        }));
+  }
+
+  setLang(lang: string): Observable<void> {
+    return this.getBackground()
+      .pipe(flatMap(bg => from<Observable<void>>(bg.setLang(lang))));
   }
 
   purgeAll(): Observable<void> {
