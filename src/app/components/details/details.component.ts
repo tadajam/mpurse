@@ -1,3 +1,5 @@
+/// <reference types="chrome"/>
+
 import { Component, OnInit, NgZone } from '@angular/core';
 import { BackgroundService } from '../../services/background.service';
 import { map, filter, flatMap, first, tap, merge } from 'rxjs/operators';

@@ -1,3 +1,5 @@
+/// <reference types="chrome"/>
+
 import { Component } from '@angular/core';
 
 @Component({
