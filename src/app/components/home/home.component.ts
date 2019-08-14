@@ -5,6 +5,7 @@ import { MatDialog, MatDialogConfig, MatBottomSheet, MatSnackBar } from '@angula
 import { Decimal } from 'decimal.js';
 import { flatMap, filter, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 interface Account {
   index: number;
@@ -77,7 +78,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private zone: NgZone,
     private router: Router,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) {
     this.subscriptions.add(
       this.router.events
@@ -191,7 +193,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open('Copied', '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('home.copied'), '', {duration: 2000});
   }
 
   lock() {
@@ -202,15 +204,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   viewMpchain(): void {
-    chrome.tabs.create({
-      url: 'https://mpchain.info/address/' + this.accountSummary.address
-    });
+    this.backgroundService.viewNewTab('https://mpchain.info/address/' + this.accountSummary.address);
   }
 
   viewInsight(): void {
-    chrome.tabs.create({
-      url: 'https://mona.insight.monaco-ex.org/insight/address/' + this.accountSummary.address
-    });
+    this.backgroundService.viewNewTab('https://mona.insight.monaco-ex.org/insight/address/' + this.accountSummary.address);
   }
 
   reflectUnconfirmed(confirmed: string, unconfirmed: string): number {

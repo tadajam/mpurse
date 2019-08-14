@@ -1,49 +1,49 @@
-<h2 fxLayoutAlign="center center">New Account</h2>
+<h2 fxLayoutAlign="center center">{{ 'addAccount.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
 <mat-tab-group [selectedIndex]="selected">
   <mat-tab>
     <ng-template mat-tab-label>
-      Create
+      {{ 'addAccount.create' | translate }}
     </ng-template>
     <ng-template matTabContent>
       <form (ngSubmit)="createAccount()">
         <mat-form-field class="full-width top-field">
-          <input matInput placeholder="Account Name" [formControl]="nameFormControl" required>
+          <input matInput placeholder="{{ 'addAccount.accountName' | translate }}" [formControl]="nameFormControl" required>
           <mat-error *ngIf="nameFormControl.hasError('required')">
-            required
+            {{ 'addAccount.required' | translate }}
           </mat-error>
         </mat-form-field>
         <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
-          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">Cancel</button>
-          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!nameFormControl.valid">Create</button>
+          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">{{ 'addAccount.cancel' | translate }}</button>
+          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!nameFormControl.valid">{{ 'addAccount.create' | translate }}</button>
         </div>
       </form>
     </ng-template>
   </mat-tab>
   <mat-tab>
     <ng-template mat-tab-label>
-      Import
+      {{ 'addAccount.import' | translate }}
     </ng-template>
     <ng-template matTabContent>
       <form [formGroup]="importForm" (ngSubmit)="importAccount()">
         <mat-form-field class="full-width top-field">
-          <input matInput placeholder="Account Name" [formControl]="nameFormControl" required>
+          <input matInput placeholder="{{ 'addAccount.accountName' | translate }}" [formControl]="nameFormControl" required>
           <mat-error *ngIf="nameFormControl.hasError('required')">
-            required
+            {{ 'addAccount.required' | translate }}
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
-          <input matInput placeholder="Your private key" required [formControl]="privatekeyFormControl">
+          <input matInput placeholder="{{ 'addAccount.privatekey' | translate }}" required [formControl]="privatekeyFormControl">
           <mat-error *ngIf="privatekeyFormControl.hasError('required')">
-            required
+            {{ 'addAccount.required' | translate }}
           </mat-error>
         </mat-form-field>
-        <p class="attention"><strong>Imported accounts will not be associated with your originally created Mpurse account passphrase.</strong></p>
+        <p class="attention"><strong>{{ 'addAccount.attentionImport' | translate }}</strong></p>
         <div fxLayout="row" fxLayoutAlign="center center" class="button-div">
-          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">Cancel</button>
-          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!importForm.valid">Import</button>
+          <button mat-stroked-button fxFlex="auto" type="button" routerLink="/">{{ 'addAccount.cancel' | translate }}</button>
+          <button mat-stroked-button fxFlex="auto" color="primary" [disabled]="!importForm.valid">{{ 'addAccount.import' | translate }}</button>
         </div>
       </form>
     </ng-template>

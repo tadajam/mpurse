@@ -6,6 +6,7 @@ import { filter, flatMap, toArray, map, tap, concat, concatAll, concatMap, reduc
 import { from, Observable, EMPTY } from 'rxjs';
 import { MatSnackBar, MatSelectChange } from '@angular/material';
 import { Decimal } from 'decimal.js';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-send',
@@ -88,7 +89,8 @@ export class SendComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -170,9 +172,9 @@ export class SendComponent implements OnInit {
           const limit = 500;
           const apiCount = new Decimal(accountSummary.assets.held).div(new Decimal(limit)).toNumber();
           for (let i = 0; i < apiCount; i++) {
-            const getbalance = this.backgroundService.getBalances(this.accountSummary.address, i + 1, limit)
-              .pipe(map(balaces => balaces.data));
-            getBalances.push(getbalance);
+            const getBalance = this.backgroundService.getBalances(this.accountSummary.address, i + 1, limit)
+              .pipe(map(balances => balances.data));
+            getBalances.push(getBalance);
           }
           return getBalances;
         }),
@@ -301,7 +303,7 @@ export class SendComponent implements OnInit {
       .subscribe({
         next: result => {
           this.zone.run(() => {
-            this.snackBar.open('Funds sent. tx_hash: ' + result.tx_hash, '', {duration: 5000, panelClass: 'break-all'});
+            this.snackBar.open(this.translate.instant('send.sent') + result.tx_hash, '', {duration: 5000, panelClass: 'break-all'});
             this.router.navigate(['/home']);
           });
         },

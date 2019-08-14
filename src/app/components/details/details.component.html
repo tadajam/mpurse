@@ -1,4 +1,4 @@
-<h2 fxLayoutAlign="center center">Account Details</h2>
+<h2 fxLayoutAlign="center center">{{ 'details.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
@@ -32,20 +32,17 @@
 
   <p fxLayoutAlign="center center" class="account-address">{{address}}</p>
 
-  <button mat-stroked-button fxFlex="auto" (click)="viewMpchain()">View on Mpchain</button>
+  <button mat-stroked-button fxFlex="auto" (click)="viewMpchain()">{{ 'details.viewMpchain' | translate }}</button>
 
   <form fxLayout="column" class="privatekey-form">
     <mat-form-field *ngIf="! privatekey" class="password-field">
-      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="Enter Password" [formControl]="passwordControl" />
+      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="{{ 'details.enterPassword' | translate }}" [formControl]="passwordControl" />
       <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
     </mat-form-field>
 
     <ng-container *ngIf="privatekey">
       <p class="attention">
-        <strong>
-          DO NOT share this privatekey with anyone!
-          This can be used to steal all your accounts.
-        </strong>
+        <strong>{{ 'details.attentionPrivatekey' | translate }}</strong>
       </p>
 
       <mat-card class="privatekey" fxLayout="row">
@@ -56,6 +53,6 @@
       </mat-card>
     </ng-container>
 
-    <button mat-stroked-button *ngIf="! privatekey" fxFlex="auto" (click)="revealPrivatekey()" [disabled]="!passwordControl.valid">Export Private Key</button>
+    <button mat-stroked-button *ngIf="! privatekey" fxFlex="auto" (click)="revealPrivatekey()" [disabled]="!passwordControl.valid">{{ 'details.exportPrivatekey' | translate }}</button>
   </form>
 </div>

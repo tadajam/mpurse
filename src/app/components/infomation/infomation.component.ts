@@ -20,6 +20,6 @@ export class InfomationComponent implements OnInit {
   }
 
   viewNewTab(url: string) {
-    chrome.tabs.create({url: url});
+    this.backgroundService.viewNewTab(url);
   }
 }

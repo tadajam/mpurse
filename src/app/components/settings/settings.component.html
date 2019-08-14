@@ -1,123 +1,69 @@
-<h2 fxLayoutAlign="center center">Settings</h2>
+<h2 fxLayoutAlign="center center">{{ 'settings.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 <div fxLayout="column" class="container">
-  <h2>Advanced Mode</h2>
-  <mat-slide-toggle color="primary" [formControl]="advancedModeToggleControl" (change)="advancedModeChanged()">
-    Advanced Mode
-  </mat-slide-toggle>
+  <h2>{{ 'settings.language' | translate }}</h2>
+  <mat-form-field>
+    <mat-label>{{ 'settings.selectLanguage' | translate }}</mat-label>
+    <mat-select [formControl]="langControl" (selectionChange)="langChanged()" required>
+      <mat-option *ngFor="let l of languages" [value]="l.langValue">
+        {{ l.langString }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 
 <mat-divider></mat-divider>
 <div fxLayout="column" class="container">
-  <h2>Reveal Passphrase</h2>
+  <h2>{{ 'settings.advancedMode' | translate }}</h2>
+  <mat-slide-toggle color="primary" [formControl]="advancedModeToggleControl" (change)="advancedModeChanged()">
+    {{ 'settings.advancedMode' | translate }}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+<div *ngIf="existsVault && isUnlocked" fxLayout="column" class="container">
+  <h2>{{ 'settings.revealPassphrase' | translate }}</h2>
 
   <form fxLayout="column">
     <mat-form-field *ngIf="! passphrase" class="password-field">
-      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="Enter Password" [formControl]="passwordControl" />
+      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="{{ 'settings.enterPassword' | translate }}" [formControl]="passwordControl" />
       <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
     </mat-form-field>
 
     <ng-container *ngIf="passphrase">
       <p class="attention">
-        <strong>
-          DO NOT share this phrase with anyone!
-          These words can be used to steal all your accounts.
-        </strong>
+        <strong>{{ 'settings.attentionPassphrase' | translate }}</strong>
       </p>
 
-      <mat-card class="passphrase" fxLayout="row">
-        <p fxFlex="auto">{{passphrase}}</p>
-        <button mat-icon-button (click)="copyPassphrase()">
-          <mat-icon>file_copy</mat-icon>
-        </button>
+      <mat-card class="passphrase">
+        <mat-card-header *ngIf="this.advancedModeToggleControl.value">
+          <mat-card-title>{{seedVersionString}}</mat-card-title>
+          <mat-card-subtitle>{{ 'settings.derivationPath' | translate }}: {{basePath}}i</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content fxLayout="row">
+          <p fxFlex="auto">{{passphrase}}</p>
+          <button mat-icon-button (click)="copyPassphrase()">
+            <mat-icon>file_copy</mat-icon>
+          </button>
+        </mat-card-content>
       </mat-card>
     </ng-container>
 
-    <button mat-stroked-button *ngIf="! passphrase" fxFlex="auto" color="primary" (click)="revealPassphrase()" [disabled]="!passwordControl.valid">Reveal Passphrase</button>
+    <button mat-stroked-button *ngIf="! passphrase" fxFlex="auto" color="primary" (click)="revealPassphrase()" [disabled]="!passwordControl.valid">{{ 'settings.revealPassphrase' | translate }}</button>
 
   </form>
 </div>
 
 <mat-divider></mat-divider>
-<div fxLayout="column" class="container">
-  <h2>Purge All Accounts</h2>
+<div *ngIf="existsVault" fxLayout="column" class="container">
+  <h2>{{ 'settings.purgeAccounts' | translate }}</h2>
 
   <p class="attention">
-    <strong>
-      All account and settings will be removed from your wallet.
-      Please make sure you have the original seed phrase before continuing.
-    </strong>
+    <strong>{{ 'settings.attentionPurge' | translate }}</strong>
   </p>
   <form fxLayout="column">
-    <mat-checkbox class="purge-check" [formControl]="canPurgeAll" required>Purge all</mat-checkbox>
-    <button mat-stroked-button fxFlex="auto" color="primary" (click)="purgeAll()" [disabled]="!canPurgeAll.valid">Purge</button>
+    <mat-checkbox class="purge-check" [formControl]="canPurgeAll" required>{{ 'settings.purgeAll' | translate }}</mat-checkbox>
+    <button mat-stroked-button fxFlex="auto" color="primary" (click)="purgeAll()" [disabled]="!canPurgeAll.valid">{{ 'settings.purge' | translate }}</button>
   </form>
 </div>
-
-<!-- <mat-card *ngIf="isUnlocked" class="container">
-  <mat-card-header>
-    <mat-card-title>Privacy Mode</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <mat-slide-toggle color="primary" [formControl]="privacyToggleControl" (change)="privacyModeChanged()">
-      Privacy Mode
-    </mat-slide-toggle>
-  </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="isUnlocked" class="container">
-  <mat-card-header>
-    <mat-card-title>Reveal Passphrase</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <form fxLayout="column">
-      <mat-form-field *ngIf="! passphrase" class="password-field">
-        <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="Enter Password" [formControl]="passwordControl" />
-        <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
-      </mat-form-field>
-
-      <ng-container *ngIf="passphrase">
-        <p class="attention">
-          <strong>
-            DO NOT share this phrase with anyone!
-            These words can be used to steal all your accounts.
-          </strong>
-        </p>
-
-        <mat-card class="passphrase" fxLayout="row">
-          <p fxFlex="auto">{{passphrase}}</p>
-          <button mat-icon-button (click)="copyPassphrase()">
-            <mat-icon>file_copy</mat-icon>
-          </button>
-        </mat-card>
-      </ng-container>
-
-      <button mat-stroked-button *ngIf="! passphrase" fxFlex="auto" color="primary" (click)="revealPassphrase()" [disabled]="!passwordControl.valid">Reveal Passphrase</button>
-
-    </form>
-  </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="existsValut" class="container">
-  <mat-card-header>
-    <mat-card-title>Purge All Accounts</mat-card-title>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <p class="attention">
-      <strong>
-        All account and settings will be removed from your wallet.
-        Please make sure you have the original seed phrase before continuing.
-      </strong>
-    </p>
-    <form fxLayout="column">
-      <mat-checkbox class="purge-check" [formControl]="canPurgeAll" required>Purge all</mat-checkbox>
-      <button mat-stroked-button fxFlex="auto" color="primary" (click)="purgeAll()" [disabled]="!canPurgeAll.valid">Purge</button>
-    </form>
-  </mat-card-content>
-</mat-card> -->
-
-

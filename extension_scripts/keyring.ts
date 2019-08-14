@@ -1,7 +1,8 @@
 import { BitcoreUtil } from './util.bitcore';
 
 interface Hdkey {
-  hdPath: string;
+  seedVersion: string;
+  basePath: string;
   mnemonic: string;
   numberOfAccounts: number;
 }
@@ -23,20 +24,20 @@ export class Keyring {
   constructor() {
     this.bitcore = new BitcoreUtil();
 
-    this.hdkey = {hdPath: '', mnemonic: '', numberOfAccounts: 0};
+    this.hdkey = {seedVersion: '', basePath: '', mnemonic: '', numberOfAccounts: 0};
     this.privatekeys = [];
 
     this.accounts = [];
   }
 
-  deserialize(passphrase: string, numberOfAccounts: number, privatekeys: string[]): void {
-    this.hdkey = {hdPath: this.bitcore.basePath, mnemonic: passphrase, numberOfAccounts: numberOfAccounts};
+  deserialize(passphrase: string, seedVersion: string, basePath: string, numberOfAccounts: number, privatekeys: string[]): void {
+    this.hdkey = {seedVersion: seedVersion, basePath: basePath, mnemonic: passphrase, numberOfAccounts: numberOfAccounts};
     this.privatekeys = privatekeys;
 
     this.accounts = [];
-    const hdPrivateKey = this.bitcore.getHDPrivateKey(passphrase);
+    const hdPrivateKey = this.bitcore.getHDPrivateKey(passphrase, seedVersion);
     for (let i = 0; i < numberOfAccounts; i++) {
-      this.setAccount(this.bitcore.getPrivateKey(hdPrivateKey, i), i);
+      this.setAccount(this.bitcore.getPrivateKey(hdPrivateKey, basePath, i), i);
     }
     for (let i = 0; i < privatekeys.length; i++) {
       this.setAccount(this.bitcore.getPrivateKeyFromWIF(privatekeys[i]), -1);
@@ -49,6 +50,10 @@ export class Keyring {
 
   getPassphrase(): string {
     return this.hdkey.mnemonic;
+  }
+
+  getHdkey(): Hdkey {
+    return this.hdkey;
   }
 
   getPrivatekey(address: string): string {
@@ -75,8 +80,8 @@ export class Keyring {
   }
 
   addAccount(): Account {
-    const hdPrivateKey = this.bitcore.getHDPrivateKey(this.hdkey.mnemonic);
-    const privatekey = this.bitcore.getPrivateKey(hdPrivateKey, this.hdkey.numberOfAccounts);
+    const hdPrivateKey = this.bitcore.getHDPrivateKey(this.hdkey.mnemonic, this.hdkey.seedVersion);
+    const privatekey = this.bitcore.getPrivateKey(hdPrivateKey, this.hdkey.basePath, this.hdkey.numberOfAccounts);
     this.setAccount(privatekey, this.hdkey.numberOfAccounts);
     this.hdkey.numberOfAccounts++;
     return this.getAccount(this.bitcore.getAddress(privatekey));
@@ -111,8 +116,8 @@ export class Keyring {
     return this.accounts.some(value => value.privatekey === this.bitcore.getPrivateKeyFromWIF(wif).toString());
   }
 
-  generateRandomMnemonic(): string {
-    return this.bitcore.generateRandomMnemonic();
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
+    return this.bitcore.generateRandomMnemonic(seedVersion, seedLanguage);
   }
 
   decodeBase58(address: string): Uint8Array {

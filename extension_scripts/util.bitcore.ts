@@ -1,15 +1,12 @@
-import * as Mnemonic from './external/mnemonic.js';
-import * as Bip39 from 'bip39';
+import * as Electrum1Mnemonic from './external/mnemonic.js';
 import * as BitCore from 'bitcore-lib';
+import * as BitCoreMnemonic from 'bitcore-mnemonic';
 import * as BitCoreMessage from 'bitcore-message';
-import * as CryptoJS from 'crypto-js';
 import { MpchainUtil } from './util.mpchain';
 
 export class BitcoreUtil {
 
   NETWORK;
-  basePath = 'm/0\'/0/';
-  // 'm/44\'/22\'/0\'/0/'
 
   constructor() {
     BitCoreMessage.MAGIC_BYTES = BitCore.deps.Buffer('Monacoin Signed Message:\n');
@@ -76,23 +73,92 @@ export class BitcoreUtil {
     this.NETWORK = BitCore.Networks.livenet;
   }
 
-  generateRandomMnemonic(): string {
-    const mnemonic = new Mnemonic(128).toWords();
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
+    switch (seedVersion) {
+      case 'Electrum1':
+        return this.generateRandomElectrum1Mnemonic();
+      case 'Electrum2':
+        return this.generateRandomElectrum2Mnemonic();
+      case 'Bip39':
+        return this.generateRandomBip39Mnemonic(seedLanguage);
+      default:
+        return '';
+    }
+  }
+
+  private generateRandomElectrum1Mnemonic(): string {
+    const mnemonic = new Electrum1Mnemonic(128).toWords();
     return mnemonic.join(' ');
   }
 
-  // generateRandomBip39Mnemonic(): string {
-  //   return Bip39.generateMnemonic();
-  // }
+  private generateRandomElectrum2Mnemonic(): string {
+    // TODO : find or write a cool library
+    return '';
+  }
 
-  getHDPrivateKey(passphrase: string): BitCore.PrivateKey {
+  private generateRandomBip39Mnemonic(seedLanguage: string): string {
+    let language: any;
+    switch (seedLanguage || 'ENGLISH') {
+      case 'CHINESE':
+        language = BitCoreMnemonic.Words.CHINESE;
+        break;
+      case 'ENGLISH':
+        language = BitCoreMnemonic.Words.ENGLISH;
+        break;
+      case 'FRENCH':
+        language = BitCoreMnemonic.Words.FRENCH;
+        break;
+      case 'ITALIAN':
+        language = BitCoreMnemonic.Words.ITALIAN;
+        break;
+      case 'JAPANESE':
+        language = BitCoreMnemonic.Words.JAPANESE;
+        break;
+      case 'KOREAN':
+        language = BitCoreMnemonic.Words.KOREAN;
+        break;
+      case 'SPANISH':
+        language = BitCoreMnemonic.Words.SPANISH;
+        break;
+      default:
+        language = BitCoreMnemonic.Words.ENGLISH;
+        break;
+    }
+    const mnemonic = new BitCoreMnemonic(language);
+    return mnemonic.toString();
+  }
+
+  getHDPrivateKey(passphrase: string, seedVersion: string): BitCore.PrivateKey {
+    switch (seedVersion) {
+      case 'Electrum1':
+        return this.getHDPrivateKeyFromElectrum1Mnemonic(passphrase);
+      case 'Electrum2':
+        return this.getHDPrivateKeyFromElectrum2Mnemonic(passphrase);
+      case 'Bip39':
+        return this.getHDPrivateKeyFromBip39Mnemonic(passphrase);
+      default:
+        return null;
+    }
+  }
+
+  private getHDPrivateKeyFromElectrum1Mnemonic(passphrase: string): BitCore.PrivateKey {
     const words = passphrase.toLowerCase().split(' ');
-    const seed = new Mnemonic(words).toHex();
+    const seed = new Electrum1Mnemonic(words).toHex();
     return BitCore.HDPrivateKey.fromSeed(seed, this.NETWORK);
   }
 
-  getPrivateKey(hDPrivateKey: BitCore.PrivateKey, index: number): BitCore.PrivateKey {
-    return hDPrivateKey.derive(this.basePath + index).privateKey;
+  private getHDPrivateKeyFromElectrum2Mnemonic(passphrase: string): BitCore.PrivateKey {
+    // TODO : find or write a cool library
+    return null;
+  }
+
+  private getHDPrivateKeyFromBip39Mnemonic(passphrase: string): BitCore.PrivateKey {
+    const code = new BitCoreMnemonic(passphrase);
+    return code.toHDPrivateKey();
+  }
+
+  getPrivateKey(hDPrivateKey: BitCore.PrivateKey, basePath: string, index: number): BitCore.PrivateKey {
+    return hDPrivateKey.derive(basePath + index).privateKey;
   }
 
   getPrivateKeyFromHex(hex: string): BitCore.PrivateKey {
@@ -207,17 +273,5 @@ export class BitcoreUtil {
       }),
       threshold: threshold
     };
-  }
-
-  // encrypt(message: string, password: string): string {
-  //   return CryptoJS.AES.encrypt(message, password).toString();
-  // }
-
-  // decrypt(cryptedMessage: string, password: string): string {
-  //   return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(cryptedMessage, password));
-  // }
-
-  createCheckSum(password: string): string {
-    return CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64);
   }
 }

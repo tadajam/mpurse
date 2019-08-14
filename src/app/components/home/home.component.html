@@ -8,7 +8,7 @@
 
     <span fxFlex="auto"></span>
 
-    <button mat-button matTooltip="Copy to clipboard" class="copy-button" (click)="copyAddress()">
+    <button mat-button matTooltip="{{ 'home.copyClipboard' | translate }}" class="copy-button" (click)="copyAddress()">
       <h4 class="account-name">{{accountSummary.name}}</h4>
       <p class="short-address">{{shortenAddress()}}</p>
     </button>
@@ -22,27 +22,27 @@
     <mat-menu #accountMenu="matMenu">
       <button mat-menu-item routerLink="/details" [queryParams]="{ name: accountSummary.name, address: accountSummary.address }">
         <mat-icon>description</mat-icon>
-        <span>Account Details</span>
+        <span>{{ 'home.accountDetails' | translate }}</span>
       </button>
       <button mat-menu-item routerLink="/signature">
         <mat-icon>create</mat-icon>
-        <span>Sign Message</span>
+        <span>{{ 'home.signMessage' | translate }}</span>
       </button>
       <button mat-menu-item routerLink="/transaction">
         <mat-icon>border_color</mat-icon>
-        <span>Sign Transaction</span>
+        <span>{{ 'home.signTransaction' | translate }}</span>
       </button>
       <button mat-menu-item (click)="viewMpchain()">
         <mat-icon>launch</mat-icon>
-        <span>View on Mpchain</span>
+        <span>{{ 'home.viewMpchain' | translate }}</span>
       </button>
       <button mat-menu-item (click)="viewInsight()">
         <mat-icon>launch</mat-icon>
-        <span>View on insight</span>
+        <span>{{ 'home.viewInsight' | translate }}</span>
       </button>
       <button *ngIf="accountSummary.isImport" mat-menu-item routerLink="/remove" [queryParams]="{ name: accountSummary.name, address: accountSummary.address }">
         <mat-icon>delete_forever</mat-icon>
-        <span>Remove Account</span>
+        <span>{{ 'home.removeAccount' | translate }}</span>
       </button>
     </mat-menu>
   </mat-toolbar>

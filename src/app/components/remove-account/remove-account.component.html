@@ -1,4 +1,4 @@
-<h2 fxLayoutAlign="center center">Remove Account</h2>
+<h2 fxLayoutAlign="center center">{{ 'removeAccount.title' | translate }}</h2>
 
 <mat-divider></mat-divider>
 
@@ -16,16 +16,13 @@
     <mat-divider></mat-divider>
 
     <p class="attention">
-      <strong>
-        This account will be removed from your wallet.
-        Please make sure you have the original seed phrase or private key for this imported account before continuing.
-      </strong>
+      <strong>{{ 'removeAccount.attentionRemove' | translate }}</strong>
     </p>
   </mat-card>
 
   <div fxLayout="row" class="button-div">
-    <button mat-stroked-button fxFlex="auto" (click)="cancel()">Cancel</button>
-    <button mat-stroked-button fxFlex="auto" color="primary" (click)="removeAccount()">Remove</button>
+    <button mat-stroked-button fxFlex="auto" (click)="cancel()">{{ 'removeAccount.cancel' | translate }}</button>
+    <button mat-stroked-button fxFlex="auto" color="primary" (click)="removeAccount()">{{ 'removeAccount.remove' | translate }}</button>
   </div>
 </div>
 

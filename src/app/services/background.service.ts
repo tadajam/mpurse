@@ -3,6 +3,7 @@ import { Subject, Observable, throwError, from } from 'rxjs';
 import { map, filter, flatMap, first, tap } from 'rxjs/operators';
 import { SafeHtml } from '@angular/platform-browser';
 import * as jazzicon from 'jazzicon';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class BackgroundService {
   private identitiesSubject = new Subject<{address: string, name: string, isImport: boolean}[]>();
   identitiesState = this.identitiesSubject.asObservable();
 
-  constructor() {}
+  constructor(private translate: TranslateService) {}
 
   private getBackground(): Observable<any> {
     return Observable.create(observer => {
@@ -80,10 +81,10 @@ export class BackgroundService {
       );
   }
 
-  saveNewPassphrase(passphrase: string): Observable<void> {
+  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string, baseName: string): Observable<void> {
     return this.getBackground()
       .pipe(
-        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase))),
+        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase, seedVersion, basePath, baseName))),
         tap(() => this.updateState())
       );
   }
@@ -92,6 +93,13 @@ export class BackgroundService {
     return this.getBackground()
       .pipe(
         map(bg => bg.getPassphrase(password))
+      );
+  }
+
+  getHdkey(password: string): Observable<any> {
+    return this.getBackground()
+      .pipe(
+        map(bg => bg.getHdkey(password))
       );
   }
 
@@ -171,6 +179,22 @@ export class BackgroundService {
       .pipe(flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled))));
   }
 
+  getLang(): Observable<string> {
+    return this.getBackground()
+      .pipe(
+        flatMap(bg => from<Observable<string>>(bg.getLang())),
+        map(l => {
+          let lang = l || this.translate.getBrowserLang();
+          lang = /(en|ja)/gi.test(lang) ? lang : 'en';
+          return lang;
+        }));
+  }
+
+  setLang(lang: string): Observable<void> {
+    return this.getBackground()
+      .pipe(flatMap(bg => from<Observable<void>>(bg.setLang(lang))));
+  }
+
   purgeAll(): Observable<void> {
     return this.getBackground()
       .pipe(
@@ -218,7 +242,7 @@ export class BackgroundService {
       return this.getBackground()
         .pipe(
           map(bg => {
-            const bytes = bg.keyring.decodeBase58(address);
+            const bytes = bg.decodeBase58(address);
             let hex = '';
             for (let i = 0; i < bytes.length; i++) {
               if (bytes[i] < 16) {
@@ -230,6 +254,10 @@ export class BackgroundService {
             return identicon.innerHTML;
           })
         );
+  }
+
+  viewNewTab(url: string): void {
+    chrome.tabs.create({url: url});
   }
 
   getBalances(address: string, page: number, limit: number): Observable<any> {
@@ -282,19 +310,14 @@ export class BackgroundService {
     });
   }
 
-  generateRandomMnemonic(): Observable<string> {
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): Observable<string> {
     return this.getBackground()
-      .pipe(map(bg => bg.keyring.generateRandomMnemonic()));
+      .pipe(map(bg => bg.generateRandomMnemonic(seedVersion, seedLanguage)));
   }
-
-  // generateRandomBip39Mnemonic(): Observable<string> {
-  //   return this.getBackground()
-  //     .pipe(map(bg => bg.bitcore.generateRandomBip39Mnemonic()));
-  // }
 
   decodeBase58(str: string): Observable<Uint8Array> {
     return this.getBackground()
-      .pipe(map(bg => bg.keyring.decodeBase58(str)));
+      .pipe(map(bg => bg.decodeBase58(str)));
   }
 
   interpretError(error: any): string {

@@ -5,6 +5,7 @@ import { BackgroundService } from '../../services/background.service';
 import { flatMap, filter, tap, map } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-signature',
@@ -35,7 +36,8 @@ export class SignatureComponent implements OnInit {
     private router: Router,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService
+    private backgroundService: BackgroundService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
@@ -82,7 +84,7 @@ export class SignatureComponent implements OnInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open('Copied', '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('signature.copied'), '', {duration: 2000});
   }
 
   sign() {
