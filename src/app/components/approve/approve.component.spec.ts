@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ApproveComponent } from './approve.component';
+import { MatDividerModule, MatSnackBarModule } from '@angular/material';
+import { RouterModule } from '@angular/router';
 
 describe('ApproveComponent', () => {
   let component: ApproveComponent;
@@ -8,6 +10,7 @@ describe('ApproveComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+        imports: [ MatDividerModule, MatSnackBarModule, RouterModule.forRoot([]) ],
       declarations: [ ApproveComponent ]
     })
     .compileComponents();

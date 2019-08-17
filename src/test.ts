@@ -1,6 +1,8 @@
 // This file is required by karma.conf.js and loads recursively all the .spec and framework files
 
 import 'zone.js/dist/zone-testing';
+import chrome from 'sinon-chrome';
+
 import { getTestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -8,6 +10,17 @@ import {
 } from '@angular/platform-browser-dynamic/testing';
 
 declare const require: any;
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      chrome: any;
+    }
+  }
+}
+
+// mock chrome for test.
+global.chrome = chrome;
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(

@@ -1,6 +1,18 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GenerateComponent } from './generate.component';
+import {
+  MatDividerModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatTabsModule,
+  MatInputModule,
+  MatCheckboxModule,
+  MatSnackBarModule
+} from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('GenerateComponent', () => {
   let component: GenerateComponent;
@@ -8,9 +20,21 @@ describe('GenerateComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GenerateComponent ]
-    })
-    .compileComponents();
+      imports: [
+        MatDividerModule,
+        MatFormFieldModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatIconModule,
+        MatTabsModule,
+        MatInputModule,
+        MatCheckboxModule,
+        MatSnackBarModule,
+        BrowserAnimationsModule,
+        RouterTestingModule
+      ],
+      declarations: [GenerateComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
