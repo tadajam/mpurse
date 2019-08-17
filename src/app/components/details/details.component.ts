@@ -4,7 +4,7 @@ import { map, filter, flatMap, first, tap, merge } from 'rxjs/operators';
 import QRCode from 'qrcode';
 import { Observable, from } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
@@ -31,7 +31,6 @@ export class DetailsComponent implements OnInit {
   constructor(
     private zone: NgZone,
     private route: ActivatedRoute,
-    private router: Router,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService,
