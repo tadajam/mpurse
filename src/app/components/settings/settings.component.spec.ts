@@ -10,11 +10,15 @@ import {
   MatCheckboxModule,
   MatButtonModule,
   MatSnackBarModule,
-  MatInputModule
+  MatInputModule,
+  MatSelectModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { createTranslateLoader } from '../../app.module';
 
 describe('SettingsComponent', () => {
   let component: SettingsComponent;
@@ -27,6 +31,7 @@ describe('SettingsComponent', () => {
         MatSlideToggleModule,
         MatFormFieldModule,
         MatInputModule,
+        MatSelectModule,
         FormsModule,
         ReactiveFormsModule,
         MatIconModule,
@@ -36,6 +41,14 @@ describe('SettingsComponent', () => {
         MatSnackBarModule,
         RouterTestingModule,
         BrowserAnimationsModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
       ],
       declarations: [ SettingsComponent ],
     })

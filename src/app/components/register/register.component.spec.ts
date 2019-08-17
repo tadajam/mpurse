@@ -5,6 +5,9 @@ import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, Ma
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { createTranslateLoader } from '../../app.module';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -23,6 +26,14 @@ describe('RegisterComponent', () => {
         MatSnackBarModule,
         BrowserAnimationsModule,
         RouterTestingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
       ],
       declarations: [ RegisterComponent ]
     })

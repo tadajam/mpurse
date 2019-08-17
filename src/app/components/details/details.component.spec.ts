@@ -9,10 +9,14 @@ import {
   MatButtonModule,
   MatCardModule,
   MatSnackBarModule,
+  MatTooltipModule,
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { createTranslateLoader } from '../../app.module';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -30,8 +34,17 @@ describe('DetailsComponent', () => {
         MatButtonModule,
         MatCardModule,
         MatSnackBarModule,
+        MatTooltipModule,
         BrowserAnimationsModule,
-        RouterModule.forRoot([]),
+        RouterTestingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
       ],
       declarations: [ DetailsComponent ]
     })

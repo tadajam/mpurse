@@ -10,9 +10,12 @@ import {
   MatListModule,
   MatLineModule,
   MatSnackBarModule,
+  MatTooltipModule
 } from '@angular/material';
-import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { createTranslateLoader } from '../../app.module';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -25,13 +28,21 @@ describe('HomeComponent', () => {
         MatIconModule,
         MatMenuModule,
         MatButtonModule,
-        RouterModule,
         MatToolbarModule,
         MatProgressBarModule,
         MatListModule,
         MatLineModule,
         MatSnackBarModule,
+        MatTooltipModule,
         RouterTestingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
       ],
       declarations: [ HomeComponent ]
     })

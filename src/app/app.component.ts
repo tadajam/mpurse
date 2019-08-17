@@ -1,5 +1,3 @@
-/// <reference types="chrome"/>
-
 import { Component, NgZone } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BackgroundService } from './services/background.service';

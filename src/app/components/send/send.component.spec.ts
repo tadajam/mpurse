@@ -11,8 +11,11 @@ import {
   MatSnackBarModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { createTranslateLoader } from '../../app.module';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SendComponent', () => {
   let component: SendComponent;
@@ -31,7 +34,15 @@ describe('SendComponent', () => {
         MatButtonModule,
         MatSnackBarModule,
         BrowserAnimationsModule,
-        RouterModule.forRoot([])
+        RouterTestingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
       ],
       declarations: [SendComponent]
     }).compileComponents();
