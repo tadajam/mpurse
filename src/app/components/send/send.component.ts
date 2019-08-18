@@ -1,10 +1,15 @@
-import { Component, OnInit, NgZone, EventEmitter } from '@angular/core';
-import { FormControl, Validators, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit, NgZone } from '@angular/core';
+import {
+  FormControl,
+  Validators,
+  FormGroup,
+  ValidationErrors
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BackgroundService } from '../../services/background.service';
-import { filter, flatMap, toArray, map, tap, concat, concatAll, concatMap, reduce } from 'rxjs/operators';
-import { from, Observable, EMPTY } from 'rxjs';
-import { MatSnackBar, MatSelectChange } from '@angular/material';
+import { filter, flatMap, map, tap, concatMap, reduce } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { MatSnackBar } from '@angular/material';
 import { Decimal } from 'decimal.js';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -14,7 +19,6 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./send.component.scss']
 })
 export class SendComponent implements OnInit {
-
   request = false;
   id = 0;
   origin = '';
@@ -28,23 +32,30 @@ export class SendComponent implements OnInit {
   hasAssignedMemoValue = false;
 
   accountSummary: {
-    address: string,
-    name: string,
-    isImport: boolean,
-    mona_balance: string,
-    xmp_balance: string,
+    address: string;
+    name: string;
+    isImport: boolean;
+    mona_balance: string;
+    xmp_balance: string;
     assets: {
-      held: number,
-      owned: number
-    }
-  } = {address: '', name: '', isImport: false, mona_balance: '', xmp_balance: '', assets: {held: 0, owned: 0}};
+      held: number;
+      owned: number;
+    };
+  } = {
+    address: '',
+    name: '',
+    isImport: false,
+    mona_balance: '',
+    xmp_balance: '',
+    assets: { held: 0, owned: 0 }
+  };
 
   assets: {
-    asset: string,
-    asset_longname: string,
-    description: string,
-    estimated_value: {mona: string, usd: string, xmp: string},
-    quantity: string
+    asset: string;
+    asset_longname: string;
+    description: string;
+    estimated_value: { mona: string; usd: string; xmp: string };
+    quantity: string;
   }[] = [];
 
   unsignedTx = '';
@@ -61,10 +72,13 @@ export class SendComponent implements OnInit {
   memoTypeControl = new FormControl('no', [Validators.required]);
   memoValueControl = new FormControl('', []);
 
-  memoGroup = new FormGroup({
-    memoType: this.memoTypeControl,
-    memoValue: this.memoValueControl
-  }, {validators: this.memoValidator});
+  memoGroup = new FormGroup(
+    {
+      memoType: this.memoTypeControl,
+      memoValue: this.memoValueControl
+    },
+    { validators: this.memoValidator }
+  );
 
   assetControl = new FormControl('MONA', [Validators.required]);
   feeControl = new FormControl(101, [Validators.required, Validators.min(10)]);
@@ -79,9 +93,15 @@ export class SendComponent implements OnInit {
   });
 
   memoValidator(group: FormGroup): ValidationErrors | null {
-    const emptyValidator = group.controls.memoType.value === 'no' ? true : group.controls.memoValue.value !== '';
-    const hexValidator = group.controls.memoType.value === 'hex' ? group.controls.memoValue.value.match(/^([0-9a-f][0-9a-f])+$/) : true;
-    return emptyValidator && hexValidator ? null : {'invalidMemo': true};
+    const emptyValidator =
+      group.controls.memoType.value === 'no'
+        ? true
+        : group.controls.memoValue.value !== '';
+    const hexValidator =
+      group.controls.memoType.value === 'hex'
+        ? group.controls.memoValue.value.match(/^([0-9a-f][0-9a-f])+$/)
+        : true;
+    return emptyValidator && hexValidator ? null : { invalidMemo: true };
   }
 
   constructor(
@@ -91,12 +111,14 @@ export class SendComponent implements OnInit {
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService,
     private translate: TranslateService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams
       .pipe(
-        filter(params => params.request || params.to || params.amount || params.asset),
+        filter(
+          params => params.request || params.to || params.amount || params.asset
+        ),
         tap(params => {
           if (params.request) {
             this.request = true;
@@ -144,7 +166,11 @@ export class SendComponent implements OnInit {
             this.hasAssignedAmount = true;
           }
 
-          if (request.data.memoType === 'no' || request.data.memoType === 'hex' || request.data.memoType === 'plain') {
+          if (
+            request.data.memoType === 'no' ||
+            request.data.memoType === 'hex' ||
+            request.data.memoType === 'plain'
+          ) {
             this.memoTypeControl.setValue(request.data.memoType);
             this.hasAssignedMemoType = true;
             if (request.data.memoType === 'no') {
@@ -159,7 +185,8 @@ export class SendComponent implements OnInit {
         });
       });
 
-    this.backgroundService.getSelectedAddress()
+    this.backgroundService
+      .getSelectedAddress()
       .pipe(
         flatMap(address => this.backgroundService.getAccountSummary(address)),
         flatMap(accountSummary => {
@@ -170,9 +197,12 @@ export class SendComponent implements OnInit {
 
           const getBalances: Observable<any>[] = [];
           const limit = 500;
-          const apiCount = new Decimal(accountSummary.assets.held).div(new Decimal(limit)).toNumber();
+          const apiCount = new Decimal(accountSummary.assets.held)
+            .div(new Decimal(limit))
+            .toNumber();
           for (let i = 0; i < apiCount; i++) {
-            const getBalance = this.backgroundService.getBalances(this.accountSummary.address, i + 1, limit)
+            const getBalance = this.backgroundService
+              .getBalances(this.accountSummary.address, i + 1, limit)
               .pipe(map(balances => balances.data));
             getBalances.push(getBalance);
           }
@@ -184,10 +214,10 @@ export class SendComponent implements OnInit {
         })
       )
       .subscribe({
-        next: assets => this.zone.run(() => this.assets = assets),
+        next: assets => this.zone.run(() => (this.assets = assets)),
         error: error => {
           this.zone.run(() => {
-            this.snackBar.open(error.toString(), '', {duration: 3000});
+            this.snackBar.open(error.toString(), '', { duration: 3000 });
           });
         }
       });
@@ -198,11 +228,16 @@ export class SendComponent implements OnInit {
           this.unsignedTx = '';
           this.calculatedFee = 0;
         }),
-        filter(() => this.sendForm.valid),
-      ).subscribe(() => this.createSend());
+        filter(() => this.sendForm.valid)
+      )
+      .subscribe(() => this.createSend());
 
-    this.backgroundService.isAdvancedModeEnabled()
-      .subscribe(isAdvancedModeEnabled => this.isAdvancedModeEnabled = isAdvancedModeEnabled);
+    this.backgroundService
+      .isAdvancedModeEnabled()
+      .subscribe(
+        isAdvancedModeEnabled =>
+          (this.isAdvancedModeEnabled = isAdvancedModeEnabled)
+      );
   }
 
   getAvailable(asset: string): string {
@@ -224,12 +259,14 @@ export class SendComponent implements OnInit {
     this.amountControl.setValue(this.getAvailable(this.assetControl.value));
   }
 
-  feeChange(event: any) {
+  feeChange(event: any): void {
     this.feeControl.setValue(event.value);
   }
 
   isAssetAvailable(): boolean {
-    return this.amountControl.value <= this.getAvailable(this.assetControl.value);
+    return (
+      this.amountControl.value <= this.getAvailable(this.assetControl.value)
+    );
   }
 
   isFeeAvailable(): boolean {
@@ -242,88 +279,109 @@ export class SendComponent implements OnInit {
   }
 
   createSendObservable(disableUtxoLocks: boolean): Observable<any> {
-    return this.backgroundService.getAsset(this.assetControl.value)
-      .pipe(
-        flatMap(assetInfo => {
-          let amount: number;
-          if (assetInfo['divisible']) {
-            amount = new Decimal(this.amountControl.value).times(new Decimal(100000000)).toNumber();
-          } else {
-            amount = new Decimal(this.amountControl.value).toNumber();
-          }
-          return this.backgroundService.createSend(
-            this.fromControl.value,
-            this.toControl.value,
-            this.assetControl.value,
-            amount,
-            this.memoTypeControl.value === 'no' ? '' : this.memoValueControl.value,
-            this.memoTypeControl.value === 'hex',
-            new Decimal(this.feeControl.value).times(new Decimal(1000)).toNumber(),
-            disableUtxoLocks
-          );
-        })
-      );
+    return this.backgroundService.getAsset(this.assetControl.value).pipe(
+      flatMap(assetInfo => {
+        let amount: number;
+        if (assetInfo['divisible']) {
+          amount = new Decimal(this.amountControl.value)
+            .times(new Decimal(100000000))
+            .toNumber();
+        } else {
+          amount = new Decimal(this.amountControl.value).toNumber();
+        }
+        return this.backgroundService.createSend(
+          this.fromControl.value,
+          this.toControl.value,
+          this.assetControl.value,
+          amount,
+          this.memoTypeControl.value === 'no'
+            ? ''
+            : this.memoValueControl.value,
+          this.memoTypeControl.value === 'hex',
+          new Decimal(this.feeControl.value)
+            .times(new Decimal(1000))
+            .toNumber(),
+          disableUtxoLocks
+        );
+      })
+    );
   }
 
-  createSend() {
+  createSend(): void {
     this.unsignedTx = '';
     this.calculatedFee = 0;
-    this.createSendObservable(true)
-      .subscribe({
-        next: result => {
-          this.zone.run(() => {
-            this.unsignedTx = result.tx_hex;
-            this.calculatedFee = result.btc_fee;
+    this.createSendObservable(true).subscribe({
+      next: result => {
+        this.zone.run(() => {
+          this.unsignedTx = result.tx_hex;
+          this.calculatedFee = result.btc_fee;
+        });
+      },
+      error: error => {
+        this.zone.run(() => {
+          this.snackBar.open(this.backgroundService.interpretError(error), '', {
+            duration: 3000
           });
-        },
-        error: error => {
-          this.zone.run(() => {
-            this.snackBar.open(this.backgroundService.interpretError(error), '', {duration: 3000});
-          });
-        }
-      });
+        });
+      }
+    });
   }
 
-  send() {
+  send(): void {
     if (this.request) {
       this.createSendObservable(false)
         .pipe(
           flatMap(result => this.backgroundService.send(result.tx_hex)),
-          flatMap(result => this.backgroundService.shiftRequest(true, this.id, {txHash: result.tx_hash}))
+          flatMap(result =>
+            this.backgroundService.shiftRequest(true, this.id, {
+              txHash: result.tx_hash
+            })
+          )
         )
         .subscribe({
           next: () => this.backgroundService.closeWindow(),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
         });
     } else {
       this.createSendObservable(false)
-      .pipe(
-        flatMap(result => this.backgroundService.send(result.tx_hex))
-      )
-      .subscribe({
-        next: result => {
-          this.zone.run(() => {
-            this.snackBar.open(this.translate.instant('send.sent') + result.tx_hash, '', {duration: 5000, panelClass: 'break-all'});
-            this.router.navigate(['/home']);
-          });
-        },
-        error: error => {
-          this.zone.run(() => {
-            this.snackBar.open(this.backgroundService.interpretError(error), '', {duration: 3000});
-          });
-        }
-      });
+        .pipe(flatMap(result => this.backgroundService.send(result.tx_hex)))
+        .subscribe({
+          next: result => {
+            this.zone.run(() => {
+              this.snackBar.open(
+                this.translate.instant('send.sent') + result.tx_hash,
+                '',
+                { duration: 5000, panelClass: 'break-all' }
+              );
+              this.router.navigate(['/home']);
+            });
+          },
+          error: error => {
+            this.zone.run(() => {
+              this.snackBar.open(
+                this.backgroundService.interpretError(error),
+                '',
+                { duration: 3000 }
+              );
+            });
+          }
+        });
     }
-
-
   }
 
-  cancel() {
+  cancel(): void {
     if (this.request) {
-      this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
+      this.backgroundService
+        .shiftRequest(false, this.id, { error: 'User Cancelled' })
         .subscribe({
           next: () => this.backgroundService.closeWindow(),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
         });
     } else {
       this.zone.run(() => this.router.navigate(['/home']));

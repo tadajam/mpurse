@@ -1,7 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddAccountComponent } from './add-account.component';
-import { MatDividerModule, MatTabsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSnackBarModule } from '@angular/material';
+import {
+  MatDividerModule,
+  MatTabsModule,
+  MatInputModule,
+  MatFormFieldModule,
+  MatButtonModule,
+  MatSnackBarModule
+} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,9 +42,8 @@ describe('AddAccountComponent', () => {
           }
         })
       ],
-      declarations: [ AddAccountComponent ]
-    })
-    .compileComponents();
+      declarations: [AddAccountComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

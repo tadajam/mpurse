@@ -6,13 +6,22 @@
     "start": "ng serve",
     "build": "ng build --prod",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "eslint . --ext .ts",
+    "fix": "eslint --fix . --ext .ts",
     "e2e": "ng e2e",
     "webpack": "node_modules/.bin/webpack --config ./extension_scripts/webpack.config.js",
     "webpack-watch": "node_modules/.bin/webpack --progress --watch --config ./extension_scripts/webpack.config.js",
     "build-all": "run-s build webpack"
   },
   "private": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": ["eslint --fix", "git add"]
+  },
   "dependencies": {
     "@angular/animations": "~8.0.0",
     "@angular/cdk": "^7.1.1",
@@ -51,7 +60,13 @@
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "codelyzer": "^5.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "husky": "^3.0.4",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",
@@ -59,12 +74,13 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
+    "lint-staged": "^9.2.3",
     "npm-run-all": "^4.1.5",
+    "prettier": "^1.18.2",
     "protractor": "~5.4.0",
     "sinon-chrome": "^3.0.1",
     "ts-loader": "^5.3.0",
     "ts-node": "~7.0.0",
-    "tslint": "~5.15.0",
     "typescript": "~3.4.3",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2"

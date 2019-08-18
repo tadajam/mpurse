@@ -12,7 +12,6 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./remove-account.component.scss']
 })
 export class RemoveAccountComponent implements OnInit {
-
   name = '';
   address = '';
   trustSvg;
@@ -24,9 +23,9 @@ export class RemoveAccountComponent implements OnInit {
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams
       .pipe(filter(params => params.name || params.address))
       .subscribe(params => {
@@ -38,32 +37,38 @@ export class RemoveAccountComponent implements OnInit {
 
   setIdentIcon(address: string): void {
     if (address === '') {
-      this.zone.run(() => this.trustSvg = null);
+      this.zone.run(() => (this.trustSvg = null));
     } else {
-      this.backgroundService.decodeBase58(address)
-        .subscribe(bytes => {
-          let hex = '';
-          for (let i = 0; i < bytes.length; i++) {
-            if (bytes[i] < 16) {
-              hex += '0';
-            }
-            hex += bytes[i].toString(16);
+      this.backgroundService.decodeBase58(address).subscribe(bytes => {
+        let hex = '';
+        for (let i = 0; i < bytes.length; i++) {
+          if (bytes[i] < 16) {
+            hex += '0';
           }
-          const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
-          this.zone.run(() => this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(identicon.innerHTML));
-        });
+          hex += bytes[i].toString(16);
+        }
+        const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
+        this.zone.run(
+          () =>
+            (this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(
+              identicon.innerHTML
+            ))
+        );
+      });
     }
   }
 
-  cancel() {
+  cancel(): void {
     this.router.navigate(['/home']);
   }
 
-  removeAccount() {
-    this.backgroundService.removeAccount(this.address)
-      .subscribe({
-        next: () => this.zone.run(() => this.router.navigate(['/home'])),
-        error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-      });
+  removeAccount(): void {
+    this.backgroundService.removeAccount(this.address).subscribe({
+      next: () => this.zone.run(() => this.router.navigate(['/home'])),
+      error: error =>
+        this.zone.run(() =>
+          this.snackBar.open(error.toString(), '', { duration: 3000 })
+        )
+    });
   }
 }

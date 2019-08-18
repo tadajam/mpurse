@@ -7,19 +7,17 @@ import { BackgroundService } from '../../services/background.service';
   styleUrls: ['./infomation.component.scss']
 })
 export class InfomationComponent implements OnInit {
-
   isUnlocked = false;
 
-  constructor(
-    private backgroundService: BackgroundService
-  ) { }
+  constructor(private backgroundService: BackgroundService) {}
 
-  ngOnInit() {
-    this.backgroundService.isUnlocked()
-      .subscribe(isUnlocked => this.isUnlocked = isUnlocked);
+  ngOnInit(): void {
+    this.backgroundService
+      .isUnlocked()
+      .subscribe(isUnlocked => (this.isUnlocked = isUnlocked));
   }
 
-  viewNewTab(url: string) {
+  viewNewTab(url: string): void {
     this.backgroundService.viewNewTab(url);
   }
 }

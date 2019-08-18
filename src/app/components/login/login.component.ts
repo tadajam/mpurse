@@ -1,6 +1,6 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormGroup, FormControl, Validators, ValidationErrors, AbstractControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { BackgroundService } from '../../services/background.service';
 
@@ -9,8 +9,7 @@ import { BackgroundService } from '../../services/background.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
-
+export class LoginComponent {
   hide = true;
   passwordControl = new FormControl('', [Validators.required]);
 
@@ -19,22 +18,17 @@ export class LoginComponent implements OnInit {
     private router: Router,
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  unlock(): void {
+    this.backgroundService.unlock(this.passwordControl.value).subscribe({
+      next: () => this.zone.run(() => this.router.navigate(['/home'])),
+      error: error => {
+        this.zone.run(() => {
+          this.passwordControl.setValue('');
+          this.snackBar.open(error.toString(), '', { duration: 3000 });
+        });
+      }
+    });
   }
-
-  unlock() {
-    this.backgroundService.unlock(this.passwordControl.value)
-      .subscribe({
-        next: () => this.zone.run(() => this.router.navigate(['/home'])),
-        error: error => {
-          this.zone.run(() => {
-            this.passwordControl.setValue('');
-            this.snackBar.open(error.toString(), '', {duration: 3000});
-          });
-        }
-      });
-  }
-
 }

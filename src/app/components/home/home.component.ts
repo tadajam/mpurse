@@ -1,9 +1,9 @@
-import { Component, OnInit, Output, NgZone, AfterViewInit, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { BackgroundService } from '../../services/background.service';
-import { MatDialog, MatDialogConfig, MatBottomSheet, MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { Decimal } from 'decimal.js';
-import { flatMap, filter, tap } from 'rxjs/operators';
+import { flatMap, filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -11,16 +11,16 @@ interface Account {
   index: number;
   address: string;
   balances: {
-    asset: string,
-    asset_longname: string,
-    description: string,
+    asset: string;
+    asset_longname: string;
+    description: string;
     estimated_value: {
-      mona: string,
-      usd: string,
-      xmp: string
-    }
-    quantity: string,
-    unconfirmed_quantity?: string
+      mona: string;
+      usd: string;
+      xmp: string;
+    };
+    quantity: string;
+    unconfirmed_quantity?: string;
   }[];
 }
 
@@ -33,8 +33,8 @@ interface AccountSummary {
   xmp_balance: string;
   unconfirmed_xmp_balance: string;
   assets: {
-    held: number,
-    owned: number
+    held: number;
+    owned: number;
   };
 }
 
@@ -44,7 +44,6 @@ interface AccountSummary {
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-
   pageLimit = 10;
 
   page = 1;
@@ -62,16 +61,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     unconfirmed_mona_balance: '',
     unconfirmed_xmp_balance: '',
     xmp_balance: '',
-    assets: {held: 0, owned: 0}
+    assets: { held: 0, owned: 0 }
   };
 
   assets: {
-    asset: string,
-    asset_longname: string,
-    description: string,
-    estimated_value: {mona: string, usd: string, xmp: string},
-    quantity: string,
-    unconfirmed_quantity: string
+    asset: string;
+    asset_longname: string;
+    description: string;
+    estimated_value: { mona: string; usd: string; xmp: string };
+    quantity: string;
+    unconfirmed_quantity: string;
   }[] = [];
 
   constructor(
@@ -86,7 +85,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         .pipe(
           filter(event => event instanceof NavigationEnd),
           flatMap(() => this.backgroundService.getSelectedAddress()),
-          filter(address => this.accountSummary.address === '' || address === this.accountSummary.address),
+          filter(
+            address =>
+              this.accountSummary.address === '' ||
+              address === this.accountSummary.address
+          ),
           flatMap(address => this.backgroundService.getAccountSummary(address))
         )
         .subscribe({
@@ -99,35 +102,38 @@ export class HomeComponent implements OnInit, OnDestroy {
           },
           error: error => {
             this.zone.run(() => {
-              this.snackBar.open(error.toString(), '', {duration: 3000});
+              this.snackBar.open(error.toString(), '', { duration: 3000 });
             });
           }
         })
     );
   }
 
-  ngOnInit() {
-    this.backgroundService.getPendingRequest()
+  ngOnInit(): void {
+    this.backgroundService
+      .getPendingRequest()
       .pipe(filter(request => request))
       .subscribe(request => {
-        this.zone.run(() => this.router.navigate(
-          ['/' + request.target],
-          { queryParams: { request: true, id: request.id } }
-        ));
+        this.zone.run(() =>
+          this.router.navigate(['/' + request.target], {
+            queryParams: { request: true, id: request.id }
+          })
+        );
       });
 
     this.subscriptions.add(
-      this.backgroundService.unlockState
-        .subscribe(isUnlocked => {
-          if (! isUnlocked) {
-            this.zone.run(() => this.router.navigate(['/login']));
-          }
-        })
+      this.backgroundService.unlockState.subscribe(isUnlocked => {
+        if (!isUnlocked) {
+          this.zone.run(() => this.router.navigate(['/login']));
+        }
+      })
     );
 
     this.subscriptions.add(
       this.backgroundService.selectedAddressState
-        .pipe(flatMap(address => this.backgroundService.getAccountSummary(address)))
+        .pipe(
+          flatMap(address => this.backgroundService.getAccountSummary(address))
+        )
         .subscribe({
           next: accountSummary => {
             this.zone.run(() => {
@@ -138,14 +144,14 @@ export class HomeComponent implements OnInit, OnDestroy {
           },
           error: error => {
             this.zone.run(() => {
-              this.snackBar.open(error.toString(), '', {duration: 3000});
+              this.snackBar.open(error.toString(), '', { duration: 3000 });
             });
           }
         })
     );
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
@@ -153,7 +159,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.page += target;
 
-    this.backgroundService.getBalances(this.accountSummary.address, this.page, this.pageLimit)
+    this.backgroundService
+      .getBalances(this.accountSummary.address, this.page, this.pageLimit)
       .subscribe({
         next: balances => {
           this.zone.run(() => {
@@ -164,7 +171,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.zone.run(() => {
-            this.snackBar.open(error.toString(), '', {duration: 3000});
+            this.snackBar.open(error.toString(), '', { duration: 3000 });
           });
         }
       });
@@ -176,11 +183,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   shortenAddress(): string {
     let str = this.accountSummary.address.substr(0, 6) + '...';
-    str += this.accountSummary.address.substr(this.accountSummary.address.length - 4, 4);
+    str += this.accountSummary.address.substr(
+      this.accountSummary.address.length - 4,
+      4
+    );
     return str;
   }
 
-  copyAddress() {
+  copyAddress(): void {
     const textarea = document.createElement('textarea');
     textarea.style.position = 'fixed';
     textarea.style.left = '0';
@@ -193,22 +203,31 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open(this.translate.instant('home.copied'), '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('home.copied'), '', {
+      duration: 2000
+    });
   }
 
-  lock() {
-    this.backgroundService.lock()
-      .subscribe({
-        error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-      });
+  lock(): void {
+    this.backgroundService.lock().subscribe({
+      error: error =>
+        this.zone.run(() =>
+          this.snackBar.open(error.toString(), '', { duration: 3000 })
+        )
+    });
   }
 
   viewMpchain(): void {
-    this.backgroundService.viewNewTab('https://mpchain.info/address/' + this.accountSummary.address);
+    this.backgroundService.viewNewTab(
+      'https://mpchain.info/address/' + this.accountSummary.address
+    );
   }
 
   viewInsight(): void {
-    this.backgroundService.viewNewTab('https://mona.insight.monaco-ex.org/insight/address/' + this.accountSummary.address);
+    this.backgroundService.viewNewTab(
+      'https://mona.insight.monaco-ex.org/insight/address/' +
+        this.accountSummary.address
+    );
   }
 
   reflectUnconfirmed(confirmed: string, unconfirmed: string): number {

@@ -1,7 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MenuButtonComponent } from './menu-button.component';
-import { MatIconModule, MatMenuModule, MatDividerModule, MatChipsModule, MatSnackBarModule } from '@angular/material';
+import {
+  MatIconModule,
+  MatMenuModule,
+  MatDividerModule,
+  MatChipsModule,
+  MatSnackBarModule
+} from '@angular/material';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -13,25 +19,24 @@ describe('MenuButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-        imports: [
-          MatIconModule,
-          MatMenuModule,
-          MatDividerModule,
-          MatChipsModule,
-          RouterTestingModule,
-          MatSnackBarModule,
-          HttpClientModule,
-          TranslateModule.forRoot({
-            loader: {
-              provide: TranslateLoader,
-              useFactory: createTranslateLoader,
-              deps: [HttpClient]
-            }
-          })
-        ],
-      declarations: [ MenuButtonComponent ]
-    })
-    .compileComponents();
+      imports: [
+        MatIconModule,
+        MatMenuModule,
+        MatDividerModule,
+        MatChipsModule,
+        RouterTestingModule,
+        MatSnackBarModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
+      ],
+      declarations: [MenuButtonComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

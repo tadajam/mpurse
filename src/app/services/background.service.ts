@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable, throwError, from } from 'rxjs';
-import { map, filter, flatMap, first, tap } from 'rxjs/operators';
-import { SafeHtml } from '@angular/platform-browser';
+import { Subject, Observable, from } from 'rxjs';
+import { map, flatMap, first, tap } from 'rxjs/operators';
 import * as jazzicon from 'jazzicon';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -9,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
   providedIn: 'root'
 })
 export class BackgroundService {
-
   private existsVaultSubject = new Subject<boolean>();
   existsVaultState = this.existsVaultSubject.asObservable();
 
@@ -19,7 +17,9 @@ export class BackgroundService {
   private selectedAddressSubject = new Subject<string>();
   selectedAddressState = this.selectedAddressSubject.asObservable();
 
-  private identitiesSubject = new Subject<{address: string, name: string, isImport: boolean}[]>();
+  private identitiesSubject = new Subject<
+    { address: string; name: string; isImport: boolean }[]
+  >();
   identitiesState = this.identitiesSubject.asObservable();
 
   constructor(private translate: TranslateService) {}
@@ -27,261 +27,298 @@ export class BackgroundService {
   private getBackground(): Observable<any> {
     return Observable.create(observer => {
       chrome.runtime.getBackgroundPage((backgroundPage: Window) => {
-        observer.next((<any>backgroundPage).bg);
+        observer.next((backgroundPage as any).bg);
       });
     }).pipe(first());
   }
 
   isUnlocked(): Observable<boolean> {
-    return this.getBackground()
-      .pipe(map(bg => bg.getIsUnlocked()));
+    return this.getBackground().pipe(map(bg => bg.getIsUnlocked()));
   }
 
   register(password: string): Observable<void> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<void>>(bg.unlock(password))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.unlock(password)))
+    );
   }
 
   unlock(password: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.unlock(password))),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.unlock(password))),
+      tap(() => this.updateState())
+    );
   }
 
   lock(): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        map(bg => bg.lock()),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      map(bg => bg.lock()),
+      tap(() => this.updateState())
+    );
   }
 
   getSelectedAddress(): Observable<string> {
-    return this.getBackground()
-      .pipe(map(bg => bg.getSelectedAddress()));
+    return this.getBackground().pipe(map(bg => bg.getSelectedAddress()));
   }
 
   setAccountName(address: string, name: string): Observable<void> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<void>>(bg.setAccountName(address, name))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.setAccountName(address, name)))
+    );
   }
 
-  getIdentities(): Observable<{address: string, name: string, isImport: boolean}[]> {
-    return this.getBackground()
-      .pipe(map(bg => bg.getIdentities()));
+  getIdentities(): Observable<
+    { address: string; name: string; isImport: boolean }[]
+  > {
+    return this.getBackground().pipe(map(bg => bg.getIdentities()));
   }
 
   changeAddress(address: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.setSelectedAddress(address))),
-        tap(() => this.changeAddressState(address))
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.setSelectedAddress(address))),
+      tap(() => this.changeAddressState(address))
+    );
   }
 
-  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string, baseName: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.saveNewPassphrase(passphrase, seedVersion, basePath, baseName))),
-        tap(() => this.updateState())
-      );
+  saveNewPassphrase(
+    passphrase: string,
+    seedVersion: string,
+    basePath: string,
+    baseName: string
+  ): Observable<void> {
+    return this.getBackground().pipe(
+      flatMap(bg =>
+        from<Observable<void>>(
+          bg.saveNewPassphrase(passphrase, seedVersion, basePath, baseName)
+        )
+      ),
+      tap(() => this.updateState())
+    );
   }
 
   getPassphrase(password: string): Observable<string> {
-    return this.getBackground()
-      .pipe(
-        map(bg => bg.getPassphrase(password))
-      );
+    return this.getBackground().pipe(map(bg => bg.getPassphrase(password)));
   }
 
   getHdkey(password: string): Observable<any> {
-    return this.getBackground()
-      .pipe(
-        map(bg => bg.getHdkey(password))
-      );
+    return this.getBackground().pipe(map(bg => bg.getHdkey(password)));
   }
 
   createAccount(name: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.createAccount(name))),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.createAccount(name))),
+      tap(() => this.updateState())
+    );
   }
 
   importAccount(privatekey: string, name: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.importAccount(privatekey, name))),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.importAccount(privatekey, name))),
+      tap(() => this.updateState())
+    );
   }
 
   getPrivatekey(password: string, address: string): Observable<string> {
-    return this.getBackground()
-      .pipe(
-        map(bg => bg.getPrivatekey(password, address))
-      );
+    return this.getBackground().pipe(
+      map(bg => bg.getPrivatekey(password, address))
+    );
   }
 
   getPendingRequest(id?: number): Observable<any | null> {
-    return this.getBackground()
-      .pipe(map(bg => bg.getPendingRequest(id)));
+    return this.getBackground().pipe(map(bg => bg.getPendingRequest(id)));
   }
 
-  shiftRequest(isSuccessful: boolean, id: number, result: any): Observable<void> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<void>>(bg.shiftRequest(isSuccessful, id, result))));
+  shiftRequest(
+    isSuccessful: boolean,
+    id: number,
+    result: any
+  ): Observable<void> {
+    return this.getBackground().pipe(
+      flatMap(bg =>
+        from<Observable<void>>(bg.shiftRequest(isSuccessful, id, result))
+      )
+    );
   }
 
   signRawTransaction(tx: string): Observable<string> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<string>>(bg.signRawTransaction(tx))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<string>>(bg.signRawTransaction(tx)))
+    );
   }
 
   signMessage(message: string): Observable<string> {
-    return this.getBackground()
-      .pipe(map(bg => bg.signMessage(message)));
+    return this.getBackground().pipe(map(bg => bg.signMessage(message)));
   }
 
   sendRawTransaction(tx: string): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(bg.sendRawTransaction(tx))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<any>>(bg.sendRawTransaction(tx)))
+    );
   }
 
   approveOrigin(origin: string, id: number): Observable<boolean> {
-    return this.getBackground()
-      .pipe(map(bg => bg.approveOrigin(origin, id)));
+    return this.getBackground().pipe(map(bg => bg.approveOrigin(origin, id)));
   }
 
   removeAccount(address: string): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.removeAccount(address))),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.removeAccount(address))),
+      tap(() => this.updateState())
+    );
   }
 
   incrementAccountName(name: string, num: number): Observable<string> {
-    return this.getBackground()
-      .pipe(map(bg => bg.incrementAccountName(name, num)));
+    return this.getBackground().pipe(
+      map(bg => bg.incrementAccountName(name, num))
+    );
   }
 
   isAdvancedModeEnabled(): Observable<boolean> {
-    return this.getBackground()
-      .pipe(map(bg => bg.isAdvancedModeEnabled()));
+    return this.getBackground().pipe(map(bg => bg.isAdvancedModeEnabled()));
   }
 
   setAdvancedMode(isEnabled: boolean): Observable<void> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled)))
+    );
   }
 
   getLang(): Observable<string> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<string>>(bg.getLang())),
-        map(l => {
-          let lang = l || this.translate.getBrowserLang();
-          lang = /(en|ja)/gi.test(lang) ? lang : 'en';
-          return lang;
-        }));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<string>>(bg.getLang())),
+      map(l => {
+        let lang = l || this.translate.getBrowserLang();
+        lang = /(en|ja)/gi.test(lang) ? lang : 'en';
+        return lang;
+      })
+    );
   }
 
   setLang(lang: string): Observable<void> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<void>>(bg.setLang(lang))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.setLang(lang)))
+    );
   }
 
   purgeAll(): Observable<void> {
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => from<Observable<void>>(bg.purgeAll())),
-        tap(() => this.updateState())
-      );
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<void>>(bg.purgeAll())),
+      tap(() => this.updateState())
+    );
   }
 
   existsVault(): Observable<boolean> {
-    return this.getBackground().pipe(flatMap(bg => from<Observable<boolean>>(bg.existsVault())));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<boolean>>(bg.existsVault()))
+    );
   }
 
   getAddressInfo(address: string): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(bg.getAddressInfo(address))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<any>>(bg.getAddressInfo(address)))
+    );
   }
 
   getAsset(asset: string): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(bg.getAsset(asset))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<any>>(bg.getAsset(asset)))
+    );
   }
 
   getAccountSummary(address: string): Observable<any> {
     let name = '';
     let isImport = false;
-    return this.getBackground()
-      .pipe(
-        flatMap(bg => {
-          const identity = bg.getIdentity(address);
-          if (identity) {
-            name = identity.name;
-            isImport = identity.isImport;
-          }
+    return this.getBackground().pipe(
+      flatMap(bg => {
+        const identity = bg.getIdentity(address);
+        if (identity) {
+          name = identity.name;
+          isImport = identity.isImport;
+        }
 
-          return from<Observable<any>>(bg.getAddressInfo(address));
-        }),
-        map(addressInfo => {
-          addressInfo['name'] = name;
-          addressInfo['isImport'] = isImport;
-          return addressInfo;
-        }));
+        return from<Observable<any>>(bg.getAddressInfo(address));
+      }),
+      map(addressInfo => {
+        addressInfo['name'] = name;
+        addressInfo['isImport'] = isImport;
+        return addressInfo;
+      })
+    );
   }
 
   getIdentIcon(address: string): Observable<string> {
-      return this.getBackground()
-        .pipe(
-          map(bg => {
-            const bytes = bg.decodeBase58(address);
-            let hex = '';
-            for (let i = 0; i < bytes.length; i++) {
-              if (bytes[i] < 16) {
-                hex += '0';
-              }
-              hex += bytes[i].toString(16);
-            }
-            const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
-            return identicon.innerHTML;
-          })
-        );
+    return this.getBackground().pipe(
+      map(bg => {
+        const bytes = bg.decodeBase58(address);
+        let hex = '';
+        for (let i = 0; i < bytes.length; i++) {
+          if (bytes[i] < 16) {
+            hex += '0';
+          }
+          hex += bytes[i].toString(16);
+        }
+        const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
+        return identicon.innerHTML;
+      })
+    );
   }
 
   viewNewTab(url: string): void {
-    chrome.tabs.create({url: url});
+    chrome.tabs.create({ url: url });
   }
 
   getBalances(address: string, page: number, limit: number): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(bg.getBalances(address, page, limit))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<any>>(bg.getBalances(address, page, limit)))
+    );
   }
 
-  createSend(source: string, destination: string, asset: string,
-    quantity: number, memo: string, memo_is_hex: boolean, fee_per_kb: number, disableUtxoLocks: boolean): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(
-        bg.createSend(source, destination, asset, quantity, memo, memo_is_hex, fee_per_kb, disableUtxoLocks))));
+  createSend(
+    source: string,
+    destination: string,
+    asset: string,
+    quantity: number,
+    memo: string,
+    memoIsHex: boolean,
+    feePerKb: number,
+    disableUtxoLocks: boolean
+  ): Observable<any> {
+    return this.getBackground().pipe(
+      flatMap(bg =>
+        from<Observable<any>>(
+          bg.createSend(
+            source,
+            destination,
+            asset,
+            quantity,
+            memo,
+            memoIsHex,
+            feePerKb,
+            disableUtxoLocks
+          )
+        )
+      )
+    );
   }
 
   send(tx: string): Observable<any> {
-    return this.getBackground()
-      .pipe(flatMap(bg => from<Observable<any>>(bg.send(tx))));
+    return this.getBackground().pipe(
+      flatMap(bg => from<Observable<any>>(bg.send(tx)))
+    );
   }
 
   updateState(): void {
-    this.existsVault().subscribe(existsVault => this.changeExistsVaultState(existsVault));
-    this.isUnlocked().subscribe(isUnlocked => this.changeUnlockState(isUnlocked));
-    this.getSelectedAddress().subscribe(address => this.changeAddressState(address));
-    this.getIdentities().subscribe(identities => this.changeIdentities(identities));
+    this.existsVault().subscribe(existsVault =>
+      this.changeExistsVaultState(existsVault)
+    );
+    this.isUnlocked().subscribe(isUnlocked =>
+      this.changeUnlockState(isUnlocked)
+    );
+    this.getSelectedAddress().subscribe(address =>
+      this.changeAddressState(address)
+    );
+    this.getIdentities().subscribe(identities =>
+      this.changeIdentities(identities)
+    );
   }
 
   changeExistsVaultState(existsVault: boolean): void {
@@ -296,7 +333,9 @@ export class BackgroundService {
     this.selectedAddressSubject.next(address);
   }
 
-  changeIdentities(identities: {address: string, name: string, isImport: boolean}[]) {
+  changeIdentities(
+    identities: { address: string; name: string; isImport: boolean }[]
+  ): void {
     this.identitiesSubject.next(identities);
   }
 
@@ -310,14 +349,17 @@ export class BackgroundService {
     });
   }
 
-  generateRandomMnemonic(seedVersion: string, seedLanguage: string): Observable<string> {
-    return this.getBackground()
-      .pipe(map(bg => bg.generateRandomMnemonic(seedVersion, seedLanguage)));
+  generateRandomMnemonic(
+    seedVersion: string,
+    seedLanguage: string
+  ): Observable<string> {
+    return this.getBackground().pipe(
+      map(bg => bg.generateRandomMnemonic(seedVersion, seedLanguage))
+    );
   }
 
   decodeBase58(str: string): Observable<Uint8Array> {
-    return this.getBackground()
-      .pipe(map(bg => bg.decodeBase58(str)));
+    return this.getBackground().pipe(map(bg => bg.decodeBase58(str)));
   }
 
   interpretError(error: any): string {
@@ -365,6 +407,11 @@ export class BackgroundService {
   }
 
   private isObject(obj: any): boolean {
-    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase() === 'object';
+    return (
+      Object.prototype.toString
+        .call(obj)
+        .slice(8, -1)
+        .toLowerCase() === 'object'
+    );
   }
 }

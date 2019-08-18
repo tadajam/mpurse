@@ -1,7 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegisterComponent } from './register.component';
-import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatButtonModule, MatSnackBarModule } from '@angular/material';
+import {
+  MatDividerModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatButtonModule,
+  MatSnackBarModule
+} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,9 +42,8 @@ describe('RegisterComponent', () => {
           }
         })
       ],
-      declarations: [ RegisterComponent ]
-    })
-    .compileComponents();
+      declarations: [RegisterComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

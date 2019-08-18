@@ -25,18 +25,18 @@ const routes: Routes = [
   { path: 'add', component: AddAccountComponent },
   { path: 'remove', component: RemoveAccountComponent },
   { path: 'details', component: DetailsComponent },
-  { path: 'settings', component: SettingsComponent},
-  { path: 'info', component: InfomationComponent},
+  { path: 'settings', component: SettingsComponent },
+  { path: 'info', component: InfomationComponent },
   { path: 'send', component: SendComponent },
-  { path: 'signature', component: SignatureComponent},
-  { path: 'transaction', component: TransactionComponent},
-  { path: 'approve', component: ApproveComponent},
+  { path: 'signature', component: SignatureComponent },
+  { path: 'transaction', component: TransactionComponent },
+  { path: 'approve', component: ApproveComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '**', component: HomeComponent, canActivate: [PrivateKeyGuard] }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload'})],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

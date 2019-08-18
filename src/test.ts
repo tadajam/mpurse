@@ -11,16 +11,8 @@ import {
 
 declare const require: any;
 
-declare global {
-  namespace NodeJS {
-    interface Global {
-      chrome: any;
-    }
-  }
-}
-
 // mock chrome for test.
-global.chrome = chrome;
+(global as any).chrome = chrome;
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(

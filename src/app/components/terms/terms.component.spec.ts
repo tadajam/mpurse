@@ -24,9 +24,8 @@ describe('TermsComponent', () => {
           }
         })
       ],
-      declarations: [ TermsComponent ]
-    })
-    .compileComponents();
+      declarations: [TermsComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

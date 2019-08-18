@@ -1,7 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SignatureComponent } from './signature.component';
-import { MatDividerModule, MatFormFieldModule, MatIconModule, MatSnackBarModule, MatInputModule } from '@angular/material';
+import {
+  MatDividerModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatSnackBarModule,
+  MatInputModule
+} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -36,9 +42,8 @@ describe('SignatureComponent', () => {
           }
         })
       ],
-      declarations: [ SignatureComponent ]
-    })
-    .compileComponents();
+      declarations: [SignatureComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

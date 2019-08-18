@@ -9,7 +9,7 @@ import {
   MatButtonModule,
   MatCardModule,
   MatSnackBarModule,
-  MatTooltipModule,
+  MatTooltipModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -46,9 +46,8 @@ describe('DetailsComponent', () => {
           }
         })
       ],
-      declarations: [ DetailsComponent ]
-    })
-    .compileComponents();
+      declarations: [DetailsComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

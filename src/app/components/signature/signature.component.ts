@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./signature.component.scss']
 })
 export class SignatureComponent implements OnInit {
-
   request = false;
   id = 0;
   origin = '';
@@ -38,13 +37,13 @@ export class SignatureComponent implements OnInit {
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService,
     private translate: TranslateService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams
       .pipe(
         filter(params => params.request),
-        tap(params => this.request = true),
+        tap(() => (this.request = true)),
         flatMap(params => this.backgroundService.getPendingRequest(params.id)),
         filter(request => request)
       )
@@ -56,7 +55,8 @@ export class SignatureComponent implements OnInit {
         });
       });
 
-    this.backgroundService.getSelectedAddress()
+    this.backgroundService
+      .getSelectedAddress()
       .pipe(
         flatMap(address => this.backgroundService.getAccountSummary(address)),
         map(accountSummary => {
@@ -64,14 +64,16 @@ export class SignatureComponent implements OnInit {
           this.address = accountSummary.address;
           return accountSummary.address;
         }),
-        flatMap(address => this.backgroundService.getIdentIcon(this.address))
+        flatMap(address => this.backgroundService.getIdentIcon(address))
       )
       .subscribe(svg => {
-        this.zone.run(() => this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(svg));
+        this.zone.run(
+          () => (this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(svg))
+        );
       });
   }
 
-  copy() {
+  copy(): void {
     const textarea = document.createElement('textarea');
     textarea.style.position = 'fixed';
     textarea.style.left = '0';
@@ -84,36 +86,54 @@ export class SignatureComponent implements OnInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open(this.translate.instant('signature.copied'), '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('signature.copied'), '', {
+      duration: 2000
+    });
   }
 
-  sign() {
+  sign(): void {
     if (this.request) {
-      this.backgroundService.signMessage(this.messageControl.value)
-        .pipe(flatMap(signature => this.backgroundService.shiftRequest(true, this.id, {signature: signature})))
+      this.backgroundService
+        .signMessage(this.messageControl.value)
+        .pipe(
+          flatMap(signature =>
+            this.backgroundService.shiftRequest(true, this.id, {
+              signature: signature
+            })
+          )
+        )
         .subscribe({
           next: () => this.backgroundService.closeWindow(),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
         });
     } else {
-      this.backgroundService.signMessage(this.messageControl.value)
-        .subscribe({
-          next: signature => this.zone.run(() => this.signatureControl.setValue(signature)),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-        });
+      this.backgroundService.signMessage(this.messageControl.value).subscribe({
+        next: signature =>
+          this.zone.run(() => this.signatureControl.setValue(signature)),
+        error: error =>
+          this.zone.run(() =>
+            this.snackBar.open(error.toString(), '', { duration: 3000 })
+          )
+      });
     }
   }
 
-  cancel() {
+  cancel(): void {
     if (this.request) {
-      this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
-      .subscribe({
-        next: () => this.backgroundService.closeWindow(),
-        error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
-      });
+      this.backgroundService
+        .shiftRequest(false, this.id, { error: 'User Cancelled' })
+        .subscribe({
+          next: () => this.backgroundService.closeWindow(),
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
+        });
     } else {
       this.zone.run(() => this.router.navigate(['/home']));
     }
   }
-
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, filter, flatMap, first } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { BackgroundService } from '../../services/background.service';
 import { MatSnackBar } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
@@ -12,7 +12,6 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./add-account.component.scss']
 })
 export class AddAccountComponent implements OnInit {
-
   selected = 0;
   nameFormControl = new FormControl('');
   privatekeyFormControl = new FormControl('', [Validators.required]);
@@ -29,39 +28,42 @@ export class AddAccountComponent implements OnInit {
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService,
     private translate: TranslateService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams
       .pipe(filter(params => params.selected))
-      .subscribe(params => this.selected = params.selected);
+      .subscribe(params => (this.selected = params.selected));
 
-    this.backgroundService.incrementAccountName(this.translate.instant('addAccount.account'), 1)
+    this.backgroundService
+      .incrementAccountName(this.translate.instant('addAccount.account'), 1)
       .subscribe(name => this.nameFormControl.setValue(name));
   }
 
-  createAccount() {
-    this.backgroundService.createAccount(this.nameFormControl.value)
+  createAccount(): void {
+    this.backgroundService.createAccount(this.nameFormControl.value).subscribe({
+      next: () => this.zone.run(() => this.router.navigate(['/home'])),
+      error: error => {
+        this.zone.run(() => {
+          this.snackBar.open(error.toString(), '', { duration: 3000 });
+        });
+      }
+    });
+  }
+
+  importAccount(): void {
+    this.backgroundService
+      .importAccount(
+        this.privatekeyFormControl.value,
+        this.nameFormControl.value
+      )
       .subscribe({
         next: () => this.zone.run(() => this.router.navigate(['/home'])),
         error: error => {
           this.zone.run(() => {
-            this.snackBar.open(error.toString(), '', {duration: 3000});
+            this.snackBar.open(error.toString(), '', { duration: 3000 });
           });
         }
       });
   }
-
-  importAccount() {
-    this.backgroundService.importAccount(this.privatekeyFormControl.value, this.nameFormControl.value)
-      .subscribe({
-        next: () => this.zone.run(() => this.router.navigate(['/home'])),
-        error: error => {
-          this.zone.run(() => {
-            this.snackBar.open(error.toString(), '', {duration: 3000});
-          });
-        }
-      });
-  }
-
 }

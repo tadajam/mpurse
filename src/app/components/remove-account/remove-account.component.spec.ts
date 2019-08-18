@@ -1,7 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RemoveAccountComponent } from './remove-account.component';
-import { MatDividerModule, MatCardModule, MatSnackBarModule } from '@angular/material';
+import {
+  MatDividerModule,
+  MatCardModule,
+  MatSnackBarModule
+} from '@angular/material';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { createTranslateLoader } from '../../app.module';
@@ -27,9 +31,8 @@ describe('RemoveAccountComponent', () => {
           }
         })
       ],
-      declarations: [ RemoveAccountComponent ]
-    })
-    .compileComponents();
+      declarations: [RemoveAccountComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

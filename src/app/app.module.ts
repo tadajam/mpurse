@@ -27,7 +27,7 @@ import { SignatureComponent } from './components/signature/signature.component';
 import { ApproveComponent } from './components/approve/approve.component';
 import { TransactionComponent } from './components/transaction/transaction.component';
 
-export function createTranslateLoader(http: HttpClient) {
+export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
@@ -70,4 +70,4 @@ export function createTranslateLoader(http: HttpClient) {
   providers: [BackgroundService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

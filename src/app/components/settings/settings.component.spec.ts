@@ -50,9 +50,8 @@ describe('SettingsComponent', () => {
           }
         })
       ],
-      declarations: [ SettingsComponent ],
-    })
-    .compileComponents();
+      declarations: [SettingsComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

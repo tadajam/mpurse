@@ -44,9 +44,8 @@ describe('HomeComponent', () => {
           }
         })
       ],
-      declarations: [ HomeComponent ]
-    })
-    .compileComponents();
+      declarations: [HomeComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

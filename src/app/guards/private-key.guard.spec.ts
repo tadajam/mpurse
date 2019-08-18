@@ -1,4 +1,4 @@
-import { TestBed, async, inject } from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
 
 import { PrivateKeyGuard } from './private-key.guard';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -9,7 +9,8 @@ import { createTranslateLoader } from '../app.module';
 describe('PrivateKeyGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule,
+      imports: [
+        RouterTestingModule,
         HttpClientModule,
         TranslateModule.forRoot({
           loader: {

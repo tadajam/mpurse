@@ -5,15 +5,17 @@ import { MpchainUtil } from './util.mpchain';
 import { Keyring } from './keyring';
 
 declare global {
-  interface Window { bg: Background; }
+  interface Window {
+    bg: Background;
+  }
 }
 
 interface VaultData {
   hdkey: {
-    seedVersion: string,
-    basePath: string,
-    mnemonic: string,
-    numberOfAccounts: number
+    seedVersion: string;
+    basePath: string;
+    mnemonic: string;
+    numberOfAccounts: number;
   };
   privatekeys: string[];
 }
@@ -29,9 +31,9 @@ interface StoredData {
 
 interface Preferences {
   identities: {
-    address: string,
-    name: string,
-    isImport: boolean
+    address: string;
+    name: string;
+    isImport: boolean;
   }[];
   selectedAddress: string;
   isAdvancedModeEnabled: boolean;
@@ -56,7 +58,6 @@ enum Platform {
 }
 
 class Background {
-
   private version = 4;
   private isUnlocked = false;
   private password: string;
@@ -66,8 +67,8 @@ class Background {
   private requests: Request[] = [];
 
   private connectedPorts: {
-    port: chrome.runtime.Port,
-    origin: string
+    port: chrome.runtime.Port;
+    origin: string;
   }[] = [];
   private approvedOrigins: string[] = [];
 
@@ -81,71 +82,84 @@ class Background {
   assignEventHandlers(): void {
     chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
       if (port.name === ContentScriptMessage.PortName) {
-        port.onMessage.addListener((message: any, connectedPort: chrome.runtime.Port) => {
-          switch (message.type) {
-            case ContentScriptMessage.InPageContent:
-              this.readAsTextInpage()
-                .then(script => {
+        port.onMessage.addListener(
+          (message: any, connectedPort: chrome.runtime.Port) => {
+            switch (message.type) {
+              case ContentScriptMessage.InPageContent:
+                this.readAsTextInpage().then(script => {
                   connectedPort.postMessage({
                     type: message.type,
                     script: script
                   });
                 });
-              break;
+                break;
 
-            case ContentScriptMessage.InPageInit:
-              connectedPort.onDisconnect.addListener((initPort: chrome.runtime.Port) => {
-                this.connectedPorts = this.connectedPorts.filter(cp => cp.port.sender.id !== initPort.sender.id);
-                this.requests = this.requests.filter(r => r.port.sender.id !== initPort.sender.id);
+              case ContentScriptMessage.InPageInit:
+                connectedPort.onDisconnect.addListener(
+                  (initPort: chrome.runtime.Port) => {
+                    this.connectedPorts = this.connectedPorts.filter(
+                      cp => cp.port.sender.id !== initPort.sender.id
+                    );
+                    this.requests = this.requests.filter(
+                      r => r.port.sender.id !== initPort.sender.id
+                    );
 
-                this.setBadgeText(false);
-              });
-              this.connectedPorts.push({port: connectedPort, origin: message.origin});
+                    this.setBadgeText(false);
+                  }
+                );
+                this.connectedPorts.push({
+                  port: connectedPort,
+                  origin: message.origin
+                });
 
-              this.executeRequest(connectedPort, message);
-              break;
-
-            case ContentScriptMessage.Address:
-              if (this.isApprovedOrigin(message.origin)) {
                 this.executeRequest(connectedPort, message);
-              } else {
-                this.setRequest('', connectedPort, message);
-              }
-              break;
+                break;
 
-            case ContentScriptMessage.SendAsset:
-              this.setRequest('send', connectedPort, message);
-              break;
+              case ContentScriptMessage.Address:
+                if (this.isApprovedOrigin(message.origin)) {
+                  this.executeRequest(connectedPort, message);
+                } else {
+                  this.setRequest('', connectedPort, message);
+                }
+                break;
 
-            case ContentScriptMessage.SignRawTransaction:
-              this.setRequest('transaction', connectedPort, message);
-              break;
+              case ContentScriptMessage.SendAsset:
+                this.setRequest('send', connectedPort, message);
+                break;
 
-            case ContentScriptMessage.SignMessage:
-              this.setRequest('signature', connectedPort, message);
-              break;
+              case ContentScriptMessage.SignRawTransaction:
+                this.setRequest('transaction', connectedPort, message);
+                break;
 
-            case ContentScriptMessage.SendRawTransaction:
-              this.setRequest('transaction', connectedPort, message);
-              break;
+              case ContentScriptMessage.SignMessage:
+                this.setRequest('signature', connectedPort, message);
+                break;
 
-            case ContentScriptMessage.Mpchain:
-              this.executeRequest(connectedPort, message);
-              break;
+              case ContentScriptMessage.SendRawTransaction:
+                this.setRequest('transaction', connectedPort, message);
+                break;
 
-            case ContentScriptMessage.CounterBlock:
-              this.executeRequest(connectedPort, message);
-              break;
+              case ContentScriptMessage.Mpchain:
+                this.executeRequest(connectedPort, message);
+                break;
 
-            case ContentScriptMessage.CounterParty:
-              this.executeRequest(connectedPort, message);
-              break;
+              case ContentScriptMessage.CounterBlock:
+                this.executeRequest(connectedPort, message);
+                break;
+
+              case ContentScriptMessage.CounterParty:
+                this.executeRequest(connectedPort, message);
+                break;
+            }
           }
-        });
+        );
       }
     });
 
-    if (this.getPlatform() === Platform.PLATFORM_CHROME || this.getPlatform() === Platform.PLATFORM_OPERA) {
+    if (
+      this.getPlatform() === Platform.PLATFORM_CHROME ||
+      this.getPlatform() === Platform.PLATFORM_OPERA
+    ) {
       chrome.runtime.onSuspend.addListener(() => {
         this.setBadgeText(true);
       });
@@ -154,12 +168,20 @@ class Background {
 
   setBadgeText(shouldDelete: boolean): void {
     if (this.getPlatform() !== Platform.PLATFORM_FIREFOX_ANDROID) {
-      chrome.browserAction.setBadgeText({text: shouldDelete || this.requests.length === 0 ? '' : this.requests.length.toString()});
+      chrome.browserAction.setBadgeText({
+        text:
+          shouldDelete || this.requests.length === 0
+            ? ''
+            : this.requests.length.toString()
+      });
     }
   }
 
   async readAsTextInpage(): Promise<string> {
-    const inpage = await fetch(chrome.runtime.getURL('extension_scripts/inpage.js'), { method: 'GET' });
+    const inpage = await fetch(
+      chrome.runtime.getURL('extension_scripts/inpage.js'),
+      { method: 'GET' }
+    );
     return await inpage.text();
   }
 
@@ -180,18 +202,21 @@ class Background {
       } else if (ua.search('OPR') !== -1) {
         return Platform.PLATFORM_OPERA;
       } else {
-      return Platform.PLATFORM_CHROME;
+        return Platform.PLATFORM_CHROME;
       }
     }
   }
 
   async send(tx: string): Promise<any> {
-    if (! this.isUnlocked) {
+    if (!this.isUnlocked) {
       this.resetPreferences();
       this.resetKeyring();
       Promise.reject('Not logged in');
     } else {
-      const hex = await this.keyring.signTransaction(tx, this.preferences.selectedAddress);
+      const hex = await this.keyring.signTransaction(
+        tx,
+        this.preferences.selectedAddress
+      );
       return MpchainUtil.sendTx(hex);
     }
   }
@@ -205,13 +230,16 @@ class Background {
   }
 
   async sendRawTransaction(tx: string): Promise<any> {
-    const hex = await this.keyring.signTransaction(tx, this.preferences.selectedAddress);
+    const hex = await this.keyring.signTransaction(
+      tx,
+      this.preferences.selectedAddress
+    );
     return MpchainUtil.sendTx(hex);
   }
 
   private popup(): void {
     if (this.getPlatform() === Platform.PLATFORM_FIREFOX_ANDROID) {
-      chrome.tabs.create({url: 'index.html'});
+      chrome.tabs.create({ url: 'index.html' });
     } else {
       chrome.windows.create({
         url: 'index.html',
@@ -222,7 +250,11 @@ class Background {
     }
   }
 
-  private setRequest(target: string, port: chrome.runtime.Port, message: any): void {
+  private setRequest(
+    target: string,
+    port: chrome.runtime.Port,
+    message: any
+  ): void {
     this.requests.unshift({
       target: target,
       port: port,
@@ -236,42 +268,77 @@ class Background {
     this.popup();
   }
 
-  private executeRequest(connectedPort: chrome.runtime.Port, message: any): void {
+  private executeRequest(
+    connectedPort: chrome.runtime.Port,
+    message: any
+  ): void {
     let response = {};
     switch (message.type) {
       case ContentScriptMessage.InPageInit:
-        response = {isUnlocked: this.isUnlocked};
-        connectedPort.postMessage({type: message.type, id: message.id, data: response});
+        response = { isUnlocked: this.isUnlocked };
+        connectedPort.postMessage({
+          type: message.type,
+          id: message.id,
+          data: response
+        });
         break;
       case ContentScriptMessage.Address:
-        response = {address: this.preferences.selectedAddress};
-        connectedPort.postMessage({type: message.type, id: message.id, data: response});
+        response = { address: this.preferences.selectedAddress };
+        connectedPort.postMessage({
+          type: message.type,
+          id: message.id,
+          data: response
+        });
         break;
       case ContentScriptMessage.Mpchain:
         MpchainUtil.mp(message.data.method, message.data.params)
           .then(result => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: result});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: result
+            });
           })
           .catch(error => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: error});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: error
+            });
           });
         break;
       case ContentScriptMessage.CounterBlock:
         MpchainUtil.cb(message.data.method, message.data.params)
           .then(result => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: result});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: result
+            });
           })
           .catch(error => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: error});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: error
+            });
           });
         break;
       case ContentScriptMessage.CounterParty:
         MpchainUtil.cp(message.data.method, message.data.params)
           .then(result => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: result});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: result
+            });
           })
           .catch(error => {
-            connectedPort.postMessage({type: message.type, id: message.id, data: error});
+            connectedPort.postMessage({
+              type: message.type,
+              id: message.id,
+              data: error
+            });
           });
         break;
     }
@@ -282,7 +349,9 @@ class Background {
     for (let i = 0; i < rb.length; i++) {
       if (rb[i].target === '' && this.isApprovedOrigin(rb[i].origin)) {
         this.executeRequest(rb[i].port, rb[i]);
-        this.requests = this.requests.filter(r => r.id.toString() !== rb[i].id.toString());
+        this.requests = this.requests.filter(
+          r => r.id.toString() !== rb[i].id.toString()
+        );
 
         this.setBadgeText(false);
       }
@@ -290,10 +359,17 @@ class Background {
   }
 
   getPendingRequest(id?: number): any | null {
-    if (this.requests.length === 0 || (id !== undefined && ! this.requests.some(r => r.id.toString() === id.toString()))) {
+    if (
+      this.requests.length === 0 ||
+      (id !== undefined &&
+        !this.requests.some(r => r.id.toString() === id.toString()))
+    ) {
       return null;
     } else {
-      const targetRequest = id !== undefined ? this.requests.find(r => r.id.toString() === id.toString()) : this.requests[0];
+      const targetRequest =
+        id !== undefined
+          ? this.requests.find(r => r.id.toString() === id.toString())
+          : this.requests[0];
       if (this.isApprovedOrigin(targetRequest.origin)) {
         return targetRequest;
       } else {
@@ -310,8 +386,11 @@ class Background {
   }
 
   shiftRequest(isSuccessful: boolean, id: number, result: any): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (this.requests.length !== 0 && this.requests.some(r => r.id.toString() === id.toString())) {
+    return new Promise<void>((resolve, reject): void => {
+      if (
+        this.requests.length !== 0 &&
+        this.requests.some(r => r.id.toString() === id.toString())
+      ) {
         this.sendResponse(isSuccessful, id, result);
         resolve();
       } else {
@@ -324,15 +403,21 @@ class Background {
     });
   }
 
-  sendResponse(isSuccessful: boolean, id: number, result: Object) {
-    let data: Object = null;
+  sendResponse(
+    isSuccessful: boolean,
+    id: number,
+    result: Record<string, any>
+  ): void {
+    let data: Record<string, any> = null;
     if (isSuccessful || 'error' in result) {
       data = result;
     } else {
-      data = {error: 'Unknown Error'};
+      data = { error: 'Unknown Error' };
     }
 
-    const targetIndex = this.requests.findIndex(r => r.id.toString() === id.toString());
+    const targetIndex = this.requests.findIndex(
+      r => r.id.toString() === id.toString()
+    );
     if (targetIndex !== -1) {
       this.requests[targetIndex].port.postMessage({
         type: this.requests[targetIndex].type,
@@ -340,18 +425,22 @@ class Background {
         data: data
       });
 
-      this.requests = this.requests.filter(r => r.id.toString() !== id.toString());
+      this.requests = this.requests.filter(
+        r => r.id.toString() !== id.toString()
+      );
 
       this.setBadgeText(false);
     }
   }
 
   approveOrigin(origin: string, id: number): boolean {
-    if (! this.isApprovedOrigin(origin)) {
+    if (!this.isApprovedOrigin(origin)) {
       this.approvedOrigins.push(origin);
       this.executePendingRequests();
     }
-    const targetIndex = this.requests.findIndex(r => r.id.toString() === id.toString());
+    const targetIndex = this.requests.findIndex(
+      r => r.id.toString() === id.toString()
+    );
     return targetIndex !== -1;
   }
 
@@ -361,7 +450,10 @@ class Background {
 
   private broadcastUpdate(type: ContentScriptMessage, data: any): void {
     for (let i = 0; i < this.connectedPorts.length; i++) {
-      if (type === ContentScriptMessage.LoginState || this.isApprovedOrigin(this.connectedPorts[i].origin)) {
+      if (
+        type === ContentScriptMessage.LoginState ||
+        this.isApprovedOrigin(this.connectedPorts[i].origin)
+      ) {
         this.connectedPorts[i].port.postMessage({
           type: type,
           id: 0,
@@ -374,7 +466,9 @@ class Background {
   private resetPassword(): void {
     this.isUnlocked = false;
     this.password = '';
-    this.broadcastUpdate(ContentScriptMessage.LoginState, {isUnlocked: this.isUnlocked});
+    this.broadcastUpdate(ContentScriptMessage.LoginState, {
+      isUnlocked: this.isUnlocked
+    });
   }
 
   private resetKeyring(): void {
@@ -382,32 +476,40 @@ class Background {
   }
 
   private resetPreferences(): void {
-    const isAdvanced = this.preferences && this.preferences.isAdvancedModeEnabled ? this.preferences.isAdvancedModeEnabled : false;
-    const lang = this.preferences && this.preferences.lang ? this.preferences.lang : null;
+    const isAdvanced =
+      this.preferences && this.preferences.isAdvancedModeEnabled
+        ? this.preferences.isAdvancedModeEnabled
+        : false;
+    const lang =
+      this.preferences && this.preferences.lang ? this.preferences.lang : null;
     this.preferences = {
       identities: [],
       selectedAddress: '',
       isAdvancedModeEnabled: isAdvanced,
       lang: lang
     };
-    this.broadcastUpdate(ContentScriptMessage.AddressState, {address: ''});
+    this.broadcastUpdate(ContentScriptMessage.AddressState, { address: '' });
   }
 
-  private resetRequest() {
+  private resetRequest(): void {
     const r = this.requests.concat();
     for (let i = 0; i < r.length; i++) {
-      this.sendResponse(false, r[i].id, {error: 'User Cancelled'});
+      this.sendResponse(false, r[i].id, { error: 'User Cancelled' });
     }
   }
 
-  private resetApprovedOrigins() {
+  private resetApprovedOrigins(): void {
     this.approvedOrigins = [];
   }
 
   unlock(pw: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject): void => {
       chrome.storage.local.get(['vault', 'preferences', 'version'], items => {
-        if ('vault' in items && 'data' in items.vault && 'checksum' in items.vault) {
+        if (
+          'vault' in items &&
+          'data' in items.vault &&
+          'checksum' in items.vault
+        ) {
           if (items.vault.checksum === EncryptUtil.createCheckSum(pw)) {
             this.password = pw;
             this.isUnlocked = true;
@@ -417,22 +519,30 @@ class Background {
               items.preferences.isAdvancedModeEnabled = this.preferences.isAdvancedModeEnabled;
             }
 
-            const key = JSON.parse(EncryptUtil.decrypt(items.vault.data, this.password));
+            const key = JSON.parse(
+              EncryptUtil.decrypt(items.vault.data, this.password)
+            );
 
             // version 2 > version 3
             if (items.version <= 2) {
               key.hdkey.seedVersion = 'Electrum1';
-              key.hdkey.basePath = 'm/0\'/0/';
+              key.hdkey.basePath = "m/0'/0/";
             }
 
             // version 3 > version 4
             if (items.version <= 3) {
-                items.preferences.lang = 'en';
+              items.preferences.lang = 'en';
             }
 
             this.preferences = items.preferences;
-            this.createKeyring(key.hdkey.mnemonic, key.hdkey.seedVersion, key.hdkey.basePath,
-                key.hdkey.numberOfAccounts, key.privatekeys, null);
+            this.createKeyring(
+              key.hdkey.mnemonic,
+              key.hdkey.seedVersion,
+              key.hdkey.basePath,
+              key.hdkey.numberOfAccounts,
+              key.privatekeys,
+              null
+            );
             resolve();
           } else {
             this.resetPassword();
@@ -465,7 +575,7 @@ class Background {
   setAdvancedMode(isEnabled: boolean): Promise<void> {
     this.preferences.isAdvancedModeEnabled = isEnabled;
 
-    if (! this.isUnlocked) {
+    if (!this.isUnlocked) {
       return this.updatePreferences();
     } else {
       return this.updateState();
@@ -473,7 +583,7 @@ class Background {
   }
 
   getLang(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>((resolve): void => {
       chrome.storage.local.get(['preferences'], items => {
         if ('preferences' in items) {
           if ('lang' in items.preferences) {
@@ -495,7 +605,7 @@ class Background {
   setLang(lang: string): Promise<void> {
     this.preferences.lang = lang;
 
-    if (! this.isUnlocked) {
+    if (!this.isUnlocked) {
       return this.updatePreferences();
     } else {
       return this.updateState();
@@ -503,13 +613,13 @@ class Background {
   }
 
   updatePreferences(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve): void => {
       chrome.storage.local.get(['preferences'], items => {
         if ('preferences' in items) {
           items.preferences.lang = this.preferences.lang;
           items.preferences.isAdvancedModeEnabled = this.preferences.isAdvancedModeEnabled;
 
-          chrome.storage.local.set({preferences: items.preferences}, () => {
+          chrome.storage.local.set({ preferences: items.preferences }, () => {
             resolve();
           });
         } else {
@@ -519,26 +629,47 @@ class Background {
     });
   }
 
-  createKeyring(passphrase: string, seedVersion: string, basePath: string,
-      numberOfAccounts: number, privatekeys: string[], baseName: string): void {
+  createKeyring(
+    passphrase: string,
+    seedVersion: string,
+    basePath: string,
+    numberOfAccounts: number,
+    privatekeys: string[],
+    baseName: string
+  ): void {
     this.keyring = new Keyring();
-    this.keyring.deserialize(passphrase, seedVersion, basePath, numberOfAccounts, privatekeys);
+    this.keyring.deserialize(
+      passphrase,
+      seedVersion,
+      basePath,
+      numberOfAccounts,
+      privatekeys
+    );
 
     const name = baseName ? baseName : 'Account';
     const accounts = this.keyring.getAccounts();
     for (let i = 0; i < accounts.length; i++) {
-      const accountName = this.incrementAccountName(name, this.preferences.identities.length + 1);
-      this.setIdentities(accounts[i].address, accountName, accounts[i].index < 0);
+      const accountName = this.incrementAccountName(
+        name,
+        this.preferences.identities.length + 1
+      );
+      this.setIdentities(
+        accounts[i].address,
+        accountName,
+        accounts[i].index < 0
+      );
     }
     if (this.preferences.selectedAddress === '') {
       this.changeAddress(accounts[0].address);
     }
 
-    this.broadcastUpdate(ContentScriptMessage.LoginState, {isUnlocked: this.isUnlocked});
+    this.broadcastUpdate(ContentScriptMessage.LoginState, {
+      isUnlocked: this.isUnlocked
+    });
   }
 
-  setIdentities(address: string, name: string, isImport: boolean) {
-    if (! this.preferences.identities.some(value => value.address === address)) {
+  setIdentities(address: string, name: string, isImport: boolean): void {
+    if (!this.preferences.identities.some(value => value.address === address)) {
       this.preferences.identities.push({
         address: address,
         name: name,
@@ -548,8 +679,8 @@ class Background {
   }
 
   private saveState(data: VaultData): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (! this.isUnlocked) {
+    return new Promise<void>((resolve, reject): void => {
+      if (!this.isUnlocked) {
         this.resetPreferences();
         this.resetKeyring();
         reject('Not Logged In.');
@@ -581,7 +712,12 @@ class Background {
     return this.keyring.decodeBase58(str);
   }
 
-  saveNewPassphrase(passphrase: string, seedVersion: string, basePath: string, baseName: string): Promise<void> {
+  saveNewPassphrase(
+    passphrase: string,
+    seedVersion: string,
+    basePath: string,
+    baseName: string
+  ): Promise<void> {
     if (this.password !== '') {
       this.isUnlocked = true;
     }
@@ -633,7 +769,9 @@ class Background {
     } else if (this.preferences.identities.some(value => value.name === name)) {
       return Promise.reject('The account name is a duplicate');
     } else if (this.keyring.containsPrivatekey(wif)) {
-      return Promise.reject('The account you are trying to import is a duplicate');
+      return Promise.reject(
+        'The account you are trying to import is a duplicate'
+      );
     } else {
       const account = this.keyring.importAccount(wif);
       this.setIdentities(account.address, name, account.index < 0);
@@ -644,15 +782,19 @@ class Background {
 
   removeAccount(address: string): Promise<void> {
     this.keyring.removeAccount(address);
-    this.preferences.identities = this.preferences.identities.filter(value => value.address !== address);
+    this.preferences.identities = this.preferences.identities.filter(
+      value => value.address !== address
+    );
     if (this.preferences.selectedAddress === address) {
       this.changeAddress(this.keyring.getAccounts()[0].address);
     }
     return this.updateState();
   }
 
-  incrementAccountName(name: string, num: number) {
-    while (this.preferences.identities.some(value => value.name === (name + ' ' + num))) {
+  incrementAccountName(name: string, num: number): string {
+    while (
+      this.preferences.identities.some(value => value.name === name + ' ' + num)
+    ) {
       num++;
     }
 
@@ -660,7 +802,7 @@ class Background {
   }
 
   purgeAll(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve): void => {
       chrome.storage.local.clear(() => {
         this.lock();
         resolve();
@@ -669,9 +811,13 @@ class Background {
   }
 
   existsVault(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve): void => {
       chrome.storage.local.get('vault', items => {
-        if ('vault' in items && 'data' in items.vault && 'checksum' in items.vault) {
+        if (
+          'vault' in items &&
+          'data' in items.vault &&
+          'checksum' in items.vault
+        ) {
           resolve(true);
         } else {
           resolve(false);
@@ -696,13 +842,15 @@ class Background {
     return MpchainUtil.getMempool(address, page, limit);
   }
 
-  getIdentities(): {address: string, name: string, isImport: boolean}[] {
+  getIdentities(): { address: string; name: string; isImport: boolean }[] {
     return this.preferences.identities;
   }
 
   setAccountName(address: string, name: string): Promise<void> {
-    const identity = this.preferences.identities.find(value => value.address === address);
-    if (! identity) {
+    const identity = this.preferences.identities.find(
+      value => value.address === address
+    );
+    if (!identity) {
       return Promise.reject('Account Not Found');
     } else if (name === '') {
       return Promise.reject('The account name is empty');
@@ -714,7 +862,9 @@ class Background {
     }
   }
 
-  getIdentity(address: string): {address: string, name: string, isImport: boolean}  {
+  getIdentity(
+    address: string
+  ): { address: string; name: string; isImport: boolean } {
     return this.preferences.identities.find(value => value.address === address);
   }
 
@@ -726,10 +876,12 @@ class Background {
     if (this.preferences.selectedAddress !== address) {
       const r = this.requests.concat();
       for (let i = 0; i < r.length; i++) {
-        this.sendResponse(false, r[i].id, {error: 'User Cancelled'});
+        this.sendResponse(false, r[i].id, { error: 'User Cancelled' });
       }
       this.preferences.selectedAddress = address;
-      this.broadcastUpdate(ContentScriptMessage.AddressState, {address: address});
+      this.broadcastUpdate(ContentScriptMessage.AddressState, {
+        address: address
+      });
     }
   }
 
@@ -738,9 +890,26 @@ class Background {
     return this.updateState();
   }
 
-  createSend(source: string, destination: string, asset: string,
-    quantity: number, memo: string, memo_is_hex: boolean, fee_per_kb: number, disableUtxoLocks: boolean): Promise<any> {
-    return MpchainUtil.createSend(source, destination, asset, quantity, memo, memo_is_hex, fee_per_kb, disableUtxoLocks);
+  createSend(
+    source: string,
+    destination: string,
+    asset: string,
+    quantity: number,
+    memo: string,
+    memoIsHex: boolean,
+    feePerKb: number,
+    disableUtxoLocks: boolean
+  ): Promise<any> {
+    return MpchainUtil.createSend(
+      source,
+      destination,
+      asset,
+      quantity,
+      memo,
+      memoIsHex,
+      feePerKb,
+      disableUtxoLocks
+    );
   }
 }
 

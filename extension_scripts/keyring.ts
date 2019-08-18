@@ -24,14 +24,30 @@ export class Keyring {
   constructor() {
     this.bitcore = new BitcoreUtil();
 
-    this.hdkey = {seedVersion: '', basePath: '', mnemonic: '', numberOfAccounts: 0};
+    this.hdkey = {
+      seedVersion: '',
+      basePath: '',
+      mnemonic: '',
+      numberOfAccounts: 0
+    };
     this.privatekeys = [];
 
     this.accounts = [];
   }
 
-  deserialize(passphrase: string, seedVersion: string, basePath: string, numberOfAccounts: number, privatekeys: string[]): void {
-    this.hdkey = {seedVersion: seedVersion, basePath: basePath, mnemonic: passphrase, numberOfAccounts: numberOfAccounts};
+  deserialize(
+    passphrase: string,
+    seedVersion: string,
+    basePath: string,
+    numberOfAccounts: number,
+    privatekeys: string[]
+  ): void {
+    this.hdkey = {
+      seedVersion: seedVersion,
+      basePath: basePath,
+      mnemonic: passphrase,
+      numberOfAccounts: numberOfAccounts
+    };
     this.privatekeys = privatekeys;
 
     this.accounts = [];
@@ -44,8 +60,8 @@ export class Keyring {
     }
   }
 
-  serialize(): {hdkey: Hdkey, privatekeys: string[]} {
-    return {hdkey: this.hdkey, privatekeys: this.privatekeys};
+  serialize(): { hdkey: Hdkey; privatekeys: string[] } {
+    return { hdkey: this.hdkey, privatekeys: this.privatekeys };
   }
 
   getPassphrase(): string {
@@ -57,11 +73,11 @@ export class Keyring {
   }
 
   getPrivatekey(address: string): string {
-      const account = this.accounts.find(value => value.address === address);
-      let wif = '';
-      if (account) {
-        wif = this.bitcore.hex2WIF(account.privatekey);
-      }
+    const account = this.accounts.find(value => value.address === address);
+    let wif = '';
+    if (account) {
+      wif = this.bitcore.hex2WIF(account.privatekey);
+    }
 
     return wif;
   }
@@ -69,7 +85,7 @@ export class Keyring {
   setAccount(privatekey: any, index: number): void {
     const address = this.bitcore.getAddress(privatekey);
 
-    if (! this.accounts.some(value => value.address === address)) {
+    if (!this.accounts.some(value => value.address === address)) {
       this.accounts.push({
         index: index,
         address: address,
@@ -80,8 +96,15 @@ export class Keyring {
   }
 
   addAccount(): Account {
-    const hdPrivateKey = this.bitcore.getHDPrivateKey(this.hdkey.mnemonic, this.hdkey.seedVersion);
-    const privatekey = this.bitcore.getPrivateKey(hdPrivateKey, this.hdkey.basePath, this.hdkey.numberOfAccounts);
+    const hdPrivateKey = this.bitcore.getHDPrivateKey(
+      this.hdkey.mnemonic,
+      this.hdkey.seedVersion
+    );
+    const privatekey = this.bitcore.getPrivateKey(
+      hdPrivateKey,
+      this.hdkey.basePath,
+      this.hdkey.numberOfAccounts
+    );
     this.setAccount(privatekey, this.hdkey.numberOfAccounts);
     this.hdkey.numberOfAccounts++;
     return this.getAccount(this.bitcore.getAddress(privatekey));
@@ -98,7 +121,7 @@ export class Keyring {
     const account = this.accounts.find(value => value.address === address);
     let wif = '';
     if (account) {
-      wif =  this.bitcore.hex2WIF(account.privatekey);
+      wif = this.bitcore.hex2WIF(account.privatekey);
     }
     this.privatekeys = this.privatekeys.filter(value => value !== wif);
     this.accounts = this.accounts.filter(value => value.address !== address);
@@ -112,8 +135,11 @@ export class Keyring {
     return this.accounts;
   }
 
-  containsPrivatekey(wif: string) {
-    return this.accounts.some(value => value.privatekey === this.bitcore.getPrivateKeyFromWIF(wif).toString());
+  containsPrivatekey(wif: string): boolean {
+    return this.accounts.some(
+      value =>
+        value.privatekey === this.bitcore.getPrivateKeyFromWIF(wif).toString()
+    );
   }
 
   generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
@@ -133,9 +159,4 @@ export class Keyring {
     const account = this.accounts.find(value => value.address === address);
     return this.bitcore.signMessage(message, account.privatekey);
   }
-
-  // private getPrivateKeyFromAddress(address: string): any {
-  //   const account = this.accounts.find(value => value.address === address);
-  //   return this.bitcore.getPrivateKeyFromHex(account.privatekey);
-  // }
 }

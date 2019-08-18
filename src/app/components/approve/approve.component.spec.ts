@@ -13,22 +13,21 @@ describe('ApproveComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-        imports: [
-          MatDividerModule,
-          MatSnackBarModule,
-          RouterTestingModule,
-          HttpClientModule,
-          TranslateModule.forRoot({
-            loader: {
-              provide: TranslateLoader,
-              useFactory: createTranslateLoader,
-              deps: [HttpClient]
-            }
-          })
-        ],
-      declarations: [ ApproveComponent ]
-    })
-    .compileComponents();
+      imports: [
+        MatDividerModule,
+        MatSnackBarModule,
+        RouterTestingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
+      ],
+      declarations: [ApproveComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

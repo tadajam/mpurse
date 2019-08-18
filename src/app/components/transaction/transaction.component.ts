@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./transaction.component.scss']
 })
 export class TransactionComponent implements OnInit {
-
   request = false;
   id = 0;
   origin = '';
@@ -39,13 +38,13 @@ export class TransactionComponent implements OnInit {
     public snackBar: MatSnackBar,
     private backgroundService: BackgroundService,
     private translate: TranslateService
-  ) { }
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams
       .pipe(
         filter(params => params.request),
-        tap(params => this.request = true),
+        tap(() => (this.request = true)),
         flatMap(params => this.backgroundService.getPendingRequest(params.id)),
         filter(request => request)
       )
@@ -58,7 +57,8 @@ export class TransactionComponent implements OnInit {
         });
       });
 
-    this.backgroundService.getSelectedAddress()
+    this.backgroundService
+      .getSelectedAddress()
       .pipe(
         flatMap(address => this.backgroundService.getAccountSummary(address)),
         map(accountSummary => {
@@ -66,14 +66,16 @@ export class TransactionComponent implements OnInit {
           this.address = accountSummary.address;
           return accountSummary.address;
         }),
-        flatMap(address => this.backgroundService.getIdentIcon(this.address))
+        flatMap(address => this.backgroundService.getIdentIcon(address))
       )
       .subscribe(svg => {
-        this.zone.run(() => this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(svg));
+        this.zone.run(
+          () => (this.trustSvg = this.sanitizer.bypassSecurityTrustHtml(svg))
+        );
       });
   }
 
-  copy() {
+  copy(): void {
     const textarea = document.createElement('textarea');
     textarea.style.position = 'fixed';
     textarea.style.left = '0';
@@ -86,45 +88,79 @@ export class TransactionComponent implements OnInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
 
-    this.snackBar.open(this.translate.instant('settings.copied'), '', {duration: 2000});
+    this.snackBar.open(this.translate.instant('settings.copied'), '', {
+      duration: 2000
+    });
   }
 
-  sign() {
+  sign(): void {
     if (this.request) {
       if (this.send) {
-        this.backgroundService.sendRawTransaction(this.rawControl.value)
-          .pipe(flatMap(result => this.backgroundService.shiftRequest(true, this.id, {txHash: result.tx_hash})))
+        this.backgroundService
+          .sendRawTransaction(this.rawControl.value)
+          .pipe(
+            flatMap(result =>
+              this.backgroundService.shiftRequest(true, this.id, {
+                txHash: result.tx_hash
+              })
+            )
+          )
           .subscribe({
             next: () => this.backgroundService.closeWindow(),
-            error: error => this.zone.run(() => this.snackBar.open(this.backgroundService.interpretError(error), '', {duration: 3000}))
+            error: error =>
+              this.zone.run(() =>
+                this.snackBar.open(
+                  this.backgroundService.interpretError(error),
+                  '',
+                  { duration: 3000 }
+                )
+              )
           });
       } else {
-        this.backgroundService.signRawTransaction(this.rawControl.value)
-          .pipe(flatMap(signedTx => this.backgroundService.shiftRequest(true, this.id, {signedTx: signedTx})))
+        this.backgroundService
+          .signRawTransaction(this.rawControl.value)
+          .pipe(
+            flatMap(signedTx =>
+              this.backgroundService.shiftRequest(true, this.id, {
+                signedTx: signedTx
+              })
+            )
+          )
           .subscribe({
             next: () => this.backgroundService.closeWindow(),
-            error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+            error: error =>
+              this.zone.run(() =>
+                this.snackBar.open(error.toString(), '', { duration: 3000 })
+              )
           });
       }
     } else {
-      this.backgroundService.signRawTransaction(this.rawControl.value)
+      this.backgroundService
+        .signRawTransaction(this.rawControl.value)
         .subscribe({
-          next: signedTx => this.zone.run(() => this.signedControl.setValue(signedTx)),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+          next: signedTx =>
+            this.zone.run(() => this.signedControl.setValue(signedTx)),
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
         });
     }
   }
 
-  cancel() {
+  cancel(): void {
     if (this.request) {
-      this.backgroundService.shiftRequest(false, this.id, {error: 'User Cancelled'})
+      this.backgroundService
+        .shiftRequest(false, this.id, { error: 'User Cancelled' })
         .subscribe({
           next: () => this.backgroundService.closeWindow(),
-          error: error => this.zone.run(() => this.snackBar.open(error.toString(), '', {duration: 3000}))
+          error: error =>
+            this.zone.run(() =>
+              this.snackBar.open(error.toString(), '', { duration: 3000 })
+            )
         });
     } else {
       this.zone.run(() => this.router.navigate(['/home']));
     }
   }
-
 }
