@@ -22,12 +22,6 @@ export class SettingsComponent implements OnInit {
 
   advancedModeToggleControl = new FormControl(false, [Validators.required]);
 
-  hide = true;
-  passwordControl = new FormControl('', [Validators.required]);
-  seedVersionString = '';
-  basePath = '';
-  passphrase = '';
-
   canPurgeAll = new FormControl('', [Validators.required]);
 
   constructor(
@@ -93,59 +87,6 @@ export class SettingsComponent implements OnInit {
             this.snackBar.open(error.toString(), '', { duration: 3000 })
           )
       });
-  }
-
-  revealPassphrase(): void {
-    this.backgroundService
-      .getHdkey(this.passwordControl.value)
-      .subscribe(hdkey => {
-        if (hdkey) {
-          this.zone.run(() => {
-            this.seedVersionString = hdkey.seedVersion;
-            switch (hdkey.seedVersion) {
-              case 'Electrum1':
-                this.seedVersionString = 'Electrum Seed Version 1';
-                break;
-              case 'Bip39':
-                this.seedVersionString = 'Bip39';
-                break;
-              default:
-                this.seedVersionString = hdkey.seedVersion;
-            }
-            this.basePath = hdkey.basePath;
-            this.passphrase = hdkey.mnemonic;
-          });
-          this.passwordControl.setValue('');
-        } else {
-          this.passphrase = '';
-          this.passwordControl.setValue('');
-          this.zone.run(() =>
-            this.snackBar.open(
-              this.translate.instant('settings.invalidPassword'),
-              '',
-              { duration: 3000 }
-            )
-          );
-        }
-      });
-  }
-
-  copyPassphrase(): void {
-    const textarea = document.createElement('textarea');
-    textarea.style.position = 'fixed';
-    textarea.style.left = '0';
-    textarea.style.top = '0';
-    textarea.style.opacity = '0';
-    textarea.value = this.passphrase;
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-
-    this.snackBar.open(this.translate.instant('settings.copied'), '', {
-      duration: 2000
-    });
   }
 
   purgeAll(): void {

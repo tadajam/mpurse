@@ -34,25 +34,7 @@
 
   <button mat-stroked-button fxFlex="auto" (click)="viewMpchain()">{{ 'details.viewMpchain' | translate }}</button>
 
-  <form fxLayout="column" class="privatekey-form">
-    <mat-form-field *ngIf="! privatekey" class="password-field">
-      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="{{ 'details.enterPassword' | translate }}" [formControl]="passwordControl" />
-      <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-    </mat-form-field>
-
-    <ng-container *ngIf="privatekey">
-      <p class="attention">
-        <strong>{{ 'details.attentionPrivatekey' | translate }}</strong>
-      </p>
-
-      <mat-card class="privatekey" fxLayout="row">
-        <p>{{privatekey}}</p>
-        <button mat-icon-button (click)="copyPrivatekey()">
-          <mat-icon>file_copy</mat-icon>
-        </button>
-      </mat-card>
-    </ng-container>
-
-    <button mat-stroked-button *ngIf="! privatekey" fxFlex="auto" (click)="revealPrivatekey()" [disabled]="!passwordControl.valid">{{ 'details.exportPrivatekey' | translate }}</button>
-  </form>
+  <button mat-stroked-button fxFlex="auto" [routerLink]="['/export', false]" class="privatekey-button">
+    {{ 'details.exportPrivatekey' | translate }}
+  </button>
 </div>

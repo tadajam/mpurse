@@ -24,35 +24,7 @@
 <mat-divider></mat-divider>
 <div *ngIf="existsVault && isUnlocked" fxLayout="column" class="container">
   <h2>{{ 'settings.revealPassphrase' | translate }}</h2>
-
-  <form fxLayout="column">
-    <mat-form-field *ngIf="! passphrase" class="password-field">
-      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="{{ 'settings.enterPassword' | translate }}" [formControl]="passwordControl" />
-      <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-    </mat-form-field>
-
-    <ng-container *ngIf="passphrase">
-      <p class="attention">
-        <strong>{{ 'settings.attentionPassphrase' | translate }}</strong>
-      </p>
-
-      <mat-card class="passphrase">
-        <mat-card-header *ngIf="this.advancedModeToggleControl.value">
-          <mat-card-title>{{seedVersionString}}</mat-card-title>
-          <mat-card-subtitle>{{ 'settings.derivationPath' | translate }}: {{basePath}}i</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content fxLayout="row">
-          <p fxFlex="auto">{{passphrase}}</p>
-          <button mat-icon-button (click)="copyPassphrase()">
-            <mat-icon>file_copy</mat-icon>
-          </button>
-        </mat-card-content>
-      </mat-card>
-    </ng-container>
-
-    <button mat-stroked-button *ngIf="! passphrase" fxFlex="auto" color="primary" (click)="revealPassphrase()" [disabled]="!passwordControl.valid">{{ 'settings.revealPassphrase' | translate }}</button>
-
-  </form>
+  <button mat-stroked-button [routerLink]="['/export', true]" fxFlex="auto" color="primary">{{ 'settings.revealPassphrase' | translate }}</button>
 </div>
 
 <mat-divider></mat-divider>

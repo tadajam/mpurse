@@ -1,10 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import {
-  CanActivate,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  Router
-} from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, flatMap, first, tap } from 'rxjs/operators';
 import { BackgroundService } from '../services/background.service';
@@ -19,10 +14,7 @@ export class PrivateKeyGuard implements CanActivate {
     private backgroundService: BackgroundService
   ) {}
 
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
+  canActivate(): Observable<boolean> | Promise<boolean> | boolean {
     return Observable.create(observer => {
       this.backgroundService
         .existsVault()

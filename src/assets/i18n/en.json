@@ -19,9 +19,17 @@
   "details": {
     "title": "Account Details",
     "viewMpchain": "View on Mpchain",
-    "enterPassword": "Enter Password",
+    "exportPrivatekey": "Export Private Key"
+  },
+  "export": {
+    "titlePassphrase": "Show Passphrase",
+    "titlePrivatekey": "Show Private Key",
+    "attentionPassphrase": "DO NOT share this phrase with anyone! These words can be used to steal all your accounts.",
     "attentionPrivatekey": "DO NOT share this privatekey with anyone! This can be used to steal your accounts.",
+    "enterPassword": "Enter Password",
     "exportPrivatekey": "Export Private Key",
+    "revealPassphrase": "Reveal Passphrase",
+    "derivationPath": "Derivation Path",
     "invalidPassword": "Password is invalid",
     "copied": "Copied"
   },
@@ -117,9 +125,6 @@
     "selectLanguage": "Select Language",
     "advancedMode": "Advanced Mode",
     "revealPassphrase": "Reveal Passphrase",
-    "enterPassword": "Enter Password",
-    "attentionPassphrase": "DO NOT share this phrase with anyone! These words can be used to steal all your accounts.",
-    "derivationPath": "Derivation Path",
     "purgeAccounts": "Purge All Accounts",
     "attentionPurge": "All account and settings will be removed from your wallet. Please make sure you have the original seed phrase before continuing.",
     "purgeAll": "Purge all",

@@ -7,7 +7,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-details',
@@ -26,17 +25,12 @@ export class DetailsComponent implements OnInit {
     Validators.maxLength(15)
   ]);
 
-  hide = true;
-  passwordControl = new FormControl('', [Validators.required]);
-  privatekey = '';
-
   constructor(
     private zone: NgZone,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     public snackBar: MatSnackBar,
-    private backgroundService: BackgroundService,
-    private translate: TranslateService
+    private backgroundService: BackgroundService
   ) {}
 
   ngOnInit(): void {
@@ -79,45 +73,6 @@ export class DetailsComponent implements OnInit {
     this.backgroundService.viewNewTab(
       'https://mpchain.info/address/' + this.address
     );
-  }
-
-  copyPrivatekey(): void {
-    const textarea = document.createElement('textarea');
-    textarea.style.position = 'fixed';
-    textarea.style.left = '0';
-    textarea.style.top = '0';
-    textarea.style.opacity = '0';
-    textarea.value = this.privatekey;
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-
-    this.snackBar.open(this.translate.instant('details.copied'), '', {
-      duration: 2000
-    });
-  }
-
-  revealPrivatekey(): void {
-    this.backgroundService
-      .getPrivatekey(this.passwordControl.value, this.address)
-      .subscribe(privatekey => {
-        if (privatekey !== '') {
-          this.zone.run(() => (this.privatekey = privatekey));
-          this.passwordControl.setValue('');
-        } else {
-          this.privatekey = '';
-          this.passwordControl.setValue('');
-          this.zone.run(() =>
-            this.snackBar.open(
-              this.translate.instant('details.invalidPassword'),
-              '',
-              { duration: 3000 }
-            )
-          );
-        }
-      });
   }
 
   setAccountName(): void {

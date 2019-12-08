@@ -19,9 +19,17 @@
   "details": {
     "title": "アカウント詳細",
     "viewMpchain": "Mpchainを表示",
-    "enterPassword": "パスワード",
+    "exportPrivatekey": "秘密鍵を表示"
+  },
+  "export": {
+    "titlePassphrase": "パスフレーズの表示",
+    "titlePrivatekey": "秘密鍵の表示",
+    "attentionPassphrase": "このフレーズを他人と共有しないでください。これらの言葉はあなたのアカウントを盗むために使用することができます。",
     "attentionPrivatekey": "この文字列を他人と共有しないでください。これはあなたのアカウントを盗むために使用することができます。",
+    "enterPassword": "パスワード",
     "exportPrivatekey": "秘密鍵を表示",
+    "revealPassphrase": "パスフレーズを表示",
+    "derivationPath": "導出パス",
     "invalidPassword": "パスワードが一致しません。",
     "copied": "コピーしました。"
   },
@@ -117,16 +125,11 @@
     "selectLanguage": "言語を選択",
     "advancedMode": "アドバンスドモード",
     "revealPassphrase": "パスフレーズを表示",
-    "enterPassword": "パスワード",
-    "attentionPassphrase": "このフレーズを他人と共有しないでください。これらの言葉はあなたのアカウントを盗むために使用することができます。",
-    "derivationPath": "導出パス",
     "purgeAccounts": "すべてのアカウントを削除",
     "attentionPurge": "すべてのアカウントと設定はあなたの財布から削除されます。続行する前に、元のシードフレーズがあることを確認してください。",
     "purgeAll": "すべて削除します",
     "purge": "削除",
-    "settingsChanged": "設定は変更されました。",
-    "invalidPassword": "パスワードが一致しません。",
-    "copied": "コピーしました。"
+    "settingsChanged": "設定は変更されました。"
   },
   "signature": {
     "title": "メッセージへ署名",

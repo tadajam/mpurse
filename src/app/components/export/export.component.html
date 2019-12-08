@@ -1,0 +1,58 @@
+<h2 fxLayoutAlign="center center">
+  {{ (isSeed ? 'export.titlePassphrase' : 'export.titlePrivatekey') | translate }}
+</h2>
+
+<mat-divider></mat-divider>
+
+<div fxLayout="column" class="container">
+  <ng-container>
+    <p class="attention">
+      <strong>{{ (isSeed ? 'export.attentionPassphrase' : 'export.attentionPrivatekey') | translate }}</strong>
+    </p>
+  </ng-container>
+
+  <form *ngIf="!isAuthenticated" fxLayout="column">
+    <mat-form-field>
+      <input matInput autofocus [type]="hide ? 'password' : 'text'" placeholder="{{ 'export.enterPassword' | translate }}" [formControl]="passwordControl" />
+      <mat-icon matSuffix (click)="hide = ! hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </mat-form-field>
+    <button (click)="revealSecret()" mat-stroked-button fxFlex="auto" [disabled]="!passwordControl.valid">
+      {{ (isSeed ? 'export.revealPassphrase' : 'export.exportPrivatekey') | translate }}
+    </button>
+  </form>
+  
+  <ng-container *ngIf="passphrase">
+
+    <mat-card class="passphrase">
+      <mat-card-header>
+        <mat-card-title>{{seedVersionString}}</mat-card-title>
+        <mat-card-subtitle>{{ 'export.derivationPath' | translate }}: {{basePath}}i</mat-card-subtitle>
+      </mat-card-header>
+      <div fxLayoutAlign="center center">
+        <img *ngIf="passphrase" [src]="passphraseQr" />
+      </div>
+      <mat-card-content fxLayout="row">
+        <p fxFlex="auto">{{passphrase}}</p>
+        <button mat-icon-button (click)="copy(passphrase)">
+          <mat-icon>file_copy</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <ng-container *ngIf="privatekey">
+
+    <mat-card class="privatekey">
+      <div fxLayoutAlign="center center">
+        <img *ngIf="privatekey" [src]="privatekeyQr" />
+      </div>
+      <mat-card-content fxLayout="row">
+        <p>{{privatekey}}</p>
+        <button mat-icon-button (click)="copy(privatekey)">
+          <mat-icon>file_copy</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+</div>

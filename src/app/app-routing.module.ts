@@ -15,6 +15,7 @@ import { SendComponent } from './components/send/send.component';
 import { SignatureComponent } from './components/signature/signature.component';
 import { ApproveComponent } from './components/approve/approve.component';
 import { TransactionComponent } from './components/transaction/transaction.component';
+import { ExportComponent } from './components/export/export.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent, canActivate: [PrivateKeyGuard] },
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'signature', component: SignatureComponent },
   { path: 'transaction', component: TransactionComponent },
   { path: 'approve', component: ApproveComponent },
+  { path: 'export/:isSeed', component: ExportComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '**', component: HomeComponent, canActivate: [PrivateKeyGuard] }
 ];
