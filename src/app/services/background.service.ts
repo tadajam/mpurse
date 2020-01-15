@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable, from } from 'rxjs';
 import { map, flatMap, first, tap } from 'rxjs/operators';
-import * as jazzicon from 'jazzicon';
+const jazzicon = require('jazzicon');
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({

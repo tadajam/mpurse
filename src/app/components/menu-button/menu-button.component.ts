@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { BackgroundService } from '../../services/background.service';
-import * as jazzicon from 'jazzicon';
+const jazzicon = require('jazzicon');
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
