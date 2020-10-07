@@ -82,7 +82,7 @@ const address = await window.mpurse.getAddress();
 const txHash = await window.mpurse.sendAsset(
   'MLinW5mA2Rnu7EjDQpnsrh6Z8APMBH6rAt',
   'XMP', 
-  114.514, 
+  114.114, 
   'plain',
   'test'
 );
