@@ -2,7 +2,7 @@ import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { BackgroundService } from '../../services/background.service';
 import * as jazzicon from 'jazzicon';
 import { Router } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 
@@ -15,7 +15,7 @@ export class MenuButtonComponent implements OnInit, OnDestroy {
   buttonElement: any;
   existsVault = false;
   isUnlocked = false;
-  trustSvg;
+  trustSvg: SafeHtml | undefined;
   selectedAddress = '';
   identities: { address: string; name: string; isImport: boolean }[] = [];
   private subscriptions = new Subscription();
@@ -73,7 +73,7 @@ export class MenuButtonComponent implements OnInit, OnDestroy {
   setIdentIcon(address: string): void {
     this.selectedAddress = address;
     if (address === '') {
-      this.zone.run(() => (this.trustSvg = null));
+      this.zone.run(() => (this.trustSvg = undefined));
     } else {
       this.backgroundService.decodeBase58(address).subscribe(bytes => {
         let hex = '';

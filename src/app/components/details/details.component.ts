@@ -3,7 +3,7 @@ import { BackgroundService } from '../../services/background.service';
 import { map, filter, flatMap } from 'rxjs/operators';
 import QRCode from 'qrcode';
 import { from } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
@@ -16,8 +16,8 @@ import { MatSnackBar } from '@angular/material';
 export class DetailsComponent implements OnInit {
   name = '';
   address = '';
-  trustSvg;
-  addressQr: string;
+  trustSvg: SafeHtml | undefined;
+  addressQr: string | undefined;
 
   editing = false;
   nameControl = new FormControl('', [

@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MatSnackBar } from '@angular/material';
 import { BackgroundService } from '../../services/background.service';
 import { filter, tap, flatMap, map } from 'rxjs/operators';
@@ -20,7 +20,7 @@ export class TransactionComponent implements OnInit {
 
   name = '';
   address = '';
-  trustSvg;
+  trustSvg: SafeHtml | undefined;
 
   rawControl = new FormControl('', [Validators.required]);
   signedControl = new FormControl('', []);
