@@ -9,8 +9,8 @@
     "lint": "eslint . --ext .ts",
     "fix": "eslint --fix . --ext .ts",
     "e2e": "ng e2e",
-    "webpack": "node_modules/.bin/webpack --config ./extension_scripts/webpack.config.js",
-    "webpack-watch": "node_modules/.bin/webpack --progress --watch --config ./extension_scripts/webpack.config.js",
+    "webpack": "webpack --config ./extension_scripts/webpack.config.js",
+    "webpack-watch": "webpack --progress --watch --config ./extension_scripts/webpack.config.js",
     "build-all": "run-s build webpack"
   },
   "private": true,

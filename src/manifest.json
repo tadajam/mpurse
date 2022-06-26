@@ -2,7 +2,7 @@
   "name": "Mpurse",
   "manifest_version": 2,
   "description": "Extension for Monaparty",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "icons": {
     "16": "assets/mpurse16.png",
     "48": "assets/mpurse48.png",
@@ -10,12 +10,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://*/*"
-      ],
-      "js": [
-        "extension_scripts/contentscript.js"
-      ],
+      "matches": ["https://*/*"],
+      "js": ["extension_scripts/contentscript.js"],
       "run_at": "document_start",
       "all_frames": true
     }
@@ -31,8 +27,5 @@
     },
     "default_popup": "index.html"
   },
-  "permissions": [
-    "storage",
-    "activeTab"
-  ]
+  "permissions": ["storage"]
 }
