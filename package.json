@@ -55,7 +55,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.800.6",
+    "@angular-devkit/build-angular": "^15.0.0",
     "@angular/cli": "^8.0.6",
     "@angular/compiler-cli": "^8.0.3",
     "@angular/language-service": "^8.0.3",
@@ -86,6 +86,6 @@
     "ts-node": "~7.0.0",
     "typescript": "~3.4.3",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.12"
   }
 }
