@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material';
 import { BackgroundService } from '../../services/background.service';
 import { flatMap, filter, tap, map } from 'rxjs/operators';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -19,7 +19,7 @@ export class SignatureComponent implements OnInit {
 
   name = '';
   address = '';
-  trustSvg;
+  trustSvg: SafeHtml | undefined;
 
   messageControl = new FormControl('', [Validators.required]);
   signatureControl = new FormControl('', []);

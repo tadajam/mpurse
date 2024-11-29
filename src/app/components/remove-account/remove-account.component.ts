@@ -2,7 +2,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import * as jazzicon from 'jazzicon';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BackgroundService } from '../../services/background.service';
 import { MatSnackBar } from '@angular/material';
 
@@ -14,7 +14,7 @@ import { MatSnackBar } from '@angular/material';
 export class RemoveAccountComponent implements OnInit {
   name = '';
   address = '';
-  trustSvg;
+  trustSvg: SafeHtml | undefined;
 
   constructor(
     private zone: NgZone,
@@ -37,7 +37,7 @@ export class RemoveAccountComponent implements OnInit {
 
   setIdentIcon(address: string): void {
     if (address === '') {
-      this.zone.run(() => (this.trustSvg = null));
+      this.zone.run(() => (this.trustSvg = undefined));
     } else {
       this.backgroundService.decodeBase58(address).subscribe(bytes => {
         let hex = '';
