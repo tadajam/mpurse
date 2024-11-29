@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import * as jazzicon from 'jazzicon';
+const jazzicon = require('jazzicon');
 import { DomSanitizer } from '@angular/platform-browser';
 import { BackgroundService } from '../../services/background.service';
 import { MatSnackBar } from '@angular/material';
