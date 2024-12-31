@@ -3,6 +3,8 @@ import { Subject, Observable, from } from 'rxjs';
 import { map, flatMap, first, tap } from 'rxjs/operators';
 import * as jazzicon from 'jazzicon';
 import { TranslateService } from '@ngx-translate/core';
+import { ExtensionMessage } from 'extension_scripts/enum/extensionMessage';
+import { Hdkey } from 'extension_scripts/keyring';
 
 @Injectable({
   providedIn: 'root'
@@ -24,58 +26,91 @@ export class BackgroundService {
 
   constructor(private translate: TranslateService) {}
 
-  private getBackground(): Observable<any> {
-    return Observable.create(observer => {
-      chrome.runtime.getBackgroundPage((backgroundPage: Window) => {
-        observer.next((backgroundPage as any).bg);
+  private sendMessage<T = void>(
+    type: ExtensionMessage,
+    payload?: any
+  ): Observable<T> {
+    return new Observable<T>(observer => {
+      chrome.runtime.sendMessage({ type, ...payload }, response => {
+        if (chrome.runtime.lastError) {
+          observer.error(chrome.runtime.lastError.message);
+        } else if (response && typeof response === 'object') {
+          if (response.success === false) {
+            try {
+              const e = JSON.parse(response.error);
+              observer.error(e);
+            } catch {
+              observer.error(response.error || 'Unknown error');
+            }
+          } else if (response.success === true) {
+            if ('body' in response) {
+              observer.next(response.body as T);
+            } else {
+              observer.next();
+            }
+            observer.complete();
+          } else {
+            observer.error('Unexpected response format');
+          }
+        } else {
+          observer.error('Invalid response format');
+        }
       });
-    }).pipe(first());
+    });
+  }
+
+  private sendMessageWithStateUpdate<T = void>(
+    type: ExtensionMessage,
+    payload?: any
+  ): Observable<T> {
+    return this.sendMessage<T>(type, payload).pipe(
+      tap(() => this.updateState())
+    );
   }
 
   isUnlocked(): Observable<boolean> {
-    return this.getBackground().pipe(map(bg => bg.getIsUnlocked()));
+    return this.sendMessage<boolean>(ExtensionMessage.IsUnlocked);
   }
 
   register(password: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.unlock(password)))
-    );
+    return this.sendMessage<void>(ExtensionMessage.Unlock, { password });
   }
 
   unlock(password: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.unlock(password))),
-      tap(() => this.updateState())
-    );
+    return this.sendMessageWithStateUpdate<void>(ExtensionMessage.Unlock, {
+      password
+    });
   }
 
   lock(): Observable<void> {
-    return this.getBackground().pipe(
-      map(bg => bg.lock()),
-      tap(() => this.updateState())
-    );
+    return this.sendMessageWithStateUpdate<void>(ExtensionMessage.Lock);
   }
 
   getSelectedAddress(): Observable<string> {
-    return this.getBackground().pipe(map(bg => bg.getSelectedAddress()));
+    return this.sendMessage<string>(ExtensionMessage.GetSelectedAddress);
   }
 
   setAccountName(address: string, name: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.setAccountName(address, name)))
-    );
+    return this.sendMessage<void>(ExtensionMessage.SetAccountName, {
+      address,
+      name
+    });
   }
 
   getIdentities(): Observable<
     { address: string; name: string; isImport: boolean }[]
   > {
-    return this.getBackground().pipe(map(bg => bg.getIdentities()));
+    return this.sendMessage<
+      { address: string; name: string; isImport: boolean }[]
+    >(ExtensionMessage.GetIdentities);
   }
 
   changeAddress(address: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.setSelectedAddress(address))),
-      tap(() => this.changeAddressState(address))
+    return this.sendMessageWithStateUpdate<void>(
+      ExtensionMessage.ChangeAddress,
+      {
+        address
+      }
     );
   }
 
@@ -85,46 +120,54 @@ export class BackgroundService {
     basePath: string,
     baseName: string
   ): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg =>
-        from<Observable<void>>(
-          bg.saveNewPassphrase(passphrase, seedVersion, basePath, baseName)
-        )
-      ),
-      tap(() => this.updateState())
+    return this.sendMessageWithStateUpdate<void>(
+      ExtensionMessage.SaveNewPassphrase,
+      {
+        passphrase,
+        seedVersion,
+        basePath,
+        baseName
+      }
     );
   }
 
   getPassphrase(password: string): Observable<string> {
-    return this.getBackground().pipe(map(bg => bg.getPassphrase(password)));
+    return this.sendMessage<string>(ExtensionMessage.GetPassphrase, {
+      password
+    });
   }
 
-  getHdkey(password: string): Observable<any> {
-    return this.getBackground().pipe(map(bg => bg.getHdkey(password)));
+  getHdkey(password: string): Observable<Hdkey> {
+    return this.sendMessage<Hdkey>(ExtensionMessage.GetHdkey, { password });
   }
 
   createAccount(name: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.createAccount(name))),
-      tap(() => this.updateState())
-    );
+    return this.sendMessage<void>(ExtensionMessage.CreateAccount, {
+      name
+    }).pipe(tap(() => this.updateState()));
   }
 
   importAccount(privatekey: string, name: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.importAccount(privatekey, name))),
-      tap(() => this.updateState())
+    return this.sendMessageWithStateUpdate<void>(
+      ExtensionMessage.ImportAccount,
+      {
+        privatekey,
+        name
+      }
     );
   }
 
   getPrivatekey(password: string, address: string): Observable<string> {
-    return this.getBackground().pipe(
-      map(bg => bg.getPrivatekey(password, address))
-    );
+    return this.sendMessage<string>(ExtensionMessage.GetPrivatekey, {
+      password,
+      address
+    });
   }
 
   getPendingRequest(id?: number): Observable<any | null> {
-    return this.getBackground().pipe(map(bg => bg.getPendingRequest(id)));
+    return this.sendMessage<any | null>(ExtensionMessage.GetPendingRequest, {
+      id
+    });
   }
 
   shiftRequest(
@@ -132,144 +175,106 @@ export class BackgroundService {
     id: number,
     result: any
   ): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg =>
-        from<Observable<void>>(bg.shiftRequest(isSuccessful, id, result))
-      )
-    );
+    return this.sendMessage<void>(ExtensionMessage.ShiftRequest, {
+      isSuccessful,
+      id,
+      result
+    });
   }
 
   signRawTransaction(tx: string): Observable<string> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<string>>(bg.signRawTransaction(tx)))
-    );
+    return this.sendMessage<string>(ExtensionMessage.SignRawTransaction, {
+      tx
+    });
   }
 
   signMessage(message: string): Observable<string> {
-    return this.getBackground().pipe(map(bg => bg.signMessage(message)));
+    return this.sendMessage<string>(ExtensionMessage.SignMessage, { message });
   }
 
   sendRawTransaction(tx: string): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<any>>(bg.sendRawTransaction(tx)))
-    );
+    return this.sendMessage<any>(ExtensionMessage.SendRawTransaction, { tx });
   }
 
   approveOrigin(origin: string, id: number): Observable<boolean> {
-    return this.getBackground().pipe(map(bg => bg.approveOrigin(origin, id)));
+    return this.sendMessage<boolean>(ExtensionMessage.ApproveOrigin, {
+      origin,
+      id
+    });
   }
 
   removeAccount(address: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.removeAccount(address))),
-      tap(() => this.updateState())
+    return this.sendMessageWithStateUpdate<void>(
+      ExtensionMessage.RemoveAccount,
+      {
+        address
+      }
     );
   }
 
   incrementAccountName(name: string, num: number): Observable<string> {
-    return this.getBackground().pipe(
-      map(bg => bg.incrementAccountName(name, num))
-    );
+    return this.sendMessage<string>(ExtensionMessage.IncrementAccountName, {
+      name,
+      num
+    });
   }
 
   isAdvancedModeEnabled(): Observable<boolean> {
-    return this.getBackground().pipe(map(bg => bg.isAdvancedModeEnabled()));
+    return this.sendMessage<boolean>(ExtensionMessage.IsAdvancedModeEnabled);
   }
 
   setAdvancedMode(isEnabled: boolean): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.setAdvancedMode(isEnabled)))
-    );
+    return this.sendMessage<void>(ExtensionMessage.SetAdvancedMode, {
+      isEnabled
+    });
   }
 
   getLang(): Observable<string> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<string>>(bg.getLang())),
-      map(l => {
-        let lang = l || this.translate.getBrowserLang();
-        lang = /(en|ja)/gi.test(lang) ? lang : 'en';
-        return lang;
+    return this.sendMessage<string>(ExtensionMessage.GetLang).pipe(
+      map(lang => {
+        let language = lang || this.translate.getBrowserLang();
+        language = /(en|ja)/gi.test(language) ? language : 'en';
+        return language;
       })
     );
   }
 
   setLang(lang: string): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.setLang(lang)))
-    );
+    return this.sendMessage<void>(ExtensionMessage.SetLang, { lang });
   }
 
   purgeAll(): Observable<void> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<void>>(bg.purgeAll())),
-      tap(() => this.updateState())
-    );
+    return this.sendMessageWithStateUpdate<void>(ExtensionMessage.PurgeAll);
   }
 
   existsVault(): Observable<boolean> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<boolean>>(bg.existsVault()))
-    );
+    return this.sendMessage<boolean>(ExtensionMessage.ExistsVault);
   }
 
   getAddressInfo(address: string): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<any>>(bg.getAddressInfo(address)))
-    );
+    return this.sendMessage<any>(ExtensionMessage.GetAddressInfo, { address });
   }
 
   getAsset(asset: string): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<any>>(bg.getAsset(asset)))
-    );
+    return this.sendMessage<any>(ExtensionMessage.GetAsset, { asset });
   }
 
   getAccountSummary(address: string): Observable<any> {
-    let name = '';
-    let isImport = false;
-    return this.getBackground().pipe(
-      flatMap(bg => {
-        const identity = bg.getIdentity(address);
-        if (identity) {
-          name = identity.name;
-          isImport = identity.isImport;
-        }
-
-        return from<Observable<any>>(bg.getAddressInfo(address));
-      }),
-      map(addressInfo => {
-        addressInfo['name'] = name;
-        addressInfo['isImport'] = isImport;
-        return addressInfo;
-      })
-    );
-  }
-
-  getIdentIcon(address: string): Observable<string> {
-    return this.getBackground().pipe(
-      map(bg => {
-        const bytes = bg.decodeBase58(address);
-        let hex = '';
-        for (let i = 0; i < bytes.length; i++) {
-          if (bytes[i] < 16) {
-            hex += '0';
-          }
-          hex += bytes[i].toString(16);
-        }
-        const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
-        return identicon.innerHTML;
-      })
-    );
+    return this.sendMessage<any>(ExtensionMessage.GetAccountSummary, {
+      address
+    });
   }
 
   viewNewTab(url: string): void {
-    chrome.tabs.create({ url: url });
+    chrome.tabs.create({ url });
   }
 
   getBalances(address: string, page: number, limit: number): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<any>>(bg.getBalances(address, page, limit)))
-    );
+    return this.sendMessage<any>(ExtensionMessage.GetBalances, {
+      address,
+      page,
+      limit
+    });
   }
 
   createSend(
@@ -282,28 +287,20 @@ export class BackgroundService {
     feePerKb: number,
     disableUtxoLocks: boolean
   ): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg =>
-        from<Observable<any>>(
-          bg.createSend(
-            source,
-            destination,
-            asset,
-            quantity,
-            memo,
-            memoIsHex,
-            feePerKb,
-            disableUtxoLocks
-          )
-        )
-      )
-    );
+    return this.sendMessage<any>(ExtensionMessage.CreateSend, {
+      source,
+      destination,
+      asset,
+      quantity,
+      memo,
+      memoIsHex,
+      feePerKb,
+      disableUtxoLocks
+    });
   }
 
   send(tx: string): Observable<any> {
-    return this.getBackground().pipe(
-      flatMap(bg => from<Observable<any>>(bg.send(tx)))
-    );
+    return this.sendMessage<any>(ExtensionMessage.Send, { tx });
   }
 
   updateState(): void {
@@ -353,13 +350,30 @@ export class BackgroundService {
     seedVersion: string,
     seedLanguage: string
   ): Observable<string> {
-    return this.getBackground().pipe(
-      map(bg => bg.generateRandomMnemonic(seedVersion, seedLanguage))
-    );
+    return this.sendMessage<string>(ExtensionMessage.GenerateRandomMnemonic, {
+      seedVersion,
+      seedLanguage
+    });
   }
 
   decodeBase58(str: string): Observable<Uint8Array> {
-    return this.getBackground().pipe(map(bg => bg.decodeBase58(str)));
+    return this.sendMessage<Uint8Array>(ExtensionMessage.DecodeBase58, { str });
+  }
+
+  getIdentIcon(address: string): Observable<string> {
+    return this.decodeBase58(address).pipe(
+      map(bytes => {
+        let hex = '';
+        for (let i = 0; i < bytes.length; i++) {
+          if (bytes[i] < 16) {
+            hex += '0';
+          }
+          hex += bytes[i].toString(16);
+        }
+        const identicon = jazzicon(38, parseInt(hex.slice(0, 16), 16));
+        return identicon.innerHTML;
+      })
+    );
   }
 
   interpretError(error: any): string {

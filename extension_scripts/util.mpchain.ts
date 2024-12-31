@@ -68,36 +68,32 @@ export class MpchainUtil {
   static API_URL = 'https://mpchain.info/api/';
 
   private static httpGet(apiString: string): Promise<any> {
-    const request = new XMLHttpRequest();
-    return new Promise((resolve): void => {
-      request.addEventListener('load', () => {
-        const json = JSON.parse(request.response);
-        resolve(json);
-      });
-      request.open('GET', this.API_URL + apiString);
-      request.send();
+    return fetch(this.API_URL + apiString).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
     });
   }
 
   private static httpPost(apiString: string, params: string): Promise<any> {
-    const request = new XMLHttpRequest();
-    return new Promise((resolve, reject): void => {
-      request.addEventListener('load', () => {
-        let json: any;
-        try {
-          json = JSON.parse(request.response);
-        } catch (e) {
-          json = { error: 'api dead' };
-        }
-        if ('code' in json || 'error' in json) {
-          reject(json);
-        } else {
-          resolve(json);
-        }
-      });
-      request.open('POST', this.API_URL + apiString);
-      request.setRequestHeader('Content-Type', 'application/json');
-      request.send(params);
+    return fetch(this.API_URL + apiString, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: params
+    }).then(async response => {
+      let json;
+      try {
+        json = await response.json();
+      } catch (e) {
+        throw { error: 'api dead' };
+      }
+      if ('code' in json || 'error' in json) {
+        throw json;
+      }
+      return json;
     });
   }
 

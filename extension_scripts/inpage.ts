@@ -45,9 +45,9 @@ class Mpurse {
   private init(): void {
     const id = Math.random();
     this.onMessage(InPageMessage.InitResponse, true, id, message => {
-      this.onMessage(InPageMessage.LoginState, false, 0, m =>
-        this.updateEmitter.emit('stateChanged', m.data.isUnlocked)
-      );
+      this.onMessage(InPageMessage.LoginState, false, 0, m => {
+        this.updateEmitter.emit('stateChanged', m.data.isUnlocked);
+      });
       this.onMessage(InPageMessage.AddressState, false, 0, m =>
         this.updateEmitter.emit('addressChanged', m.data.address)
       );

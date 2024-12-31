@@ -1,8 +1,8 @@
 {
   "name": "Mpurse",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "description": "Extension for Monaparty",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "icons": {
     "16": "assets/mpurse16.png",
     "48": "assets/mpurse48.png",
@@ -13,19 +13,25 @@
       "matches": ["https://*/*"],
       "js": ["extension_scripts/contentscript.js"],
       "run_at": "document_start",
-      "all_frames": true
+      "all_frames": false
     }
   ],
   "background": {
-    "scripts": ["extension_scripts/background.js"],
-    "persistent": false
+    "service_worker": "extension_scripts/background.js"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Mpurse",
     "default_icon": {
       "19": "assets/mpurse19.png"
     },
     "default_popup": "index.html"
   },
-  "permissions": ["storage"]
+  "permissions": ["storage", "tabs", "activeTab"],
+  "host_permissions": ["https://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["extension_scripts/inpage.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

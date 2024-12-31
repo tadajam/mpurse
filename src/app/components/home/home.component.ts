@@ -3,7 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { BackgroundService } from '../../services/background.service';
 import { MatSnackBar } from '@angular/material';
 import { Decimal } from 'decimal.js';
-import { flatMap, filter } from 'rxjs/operators';
+import { flatMap, filter, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 

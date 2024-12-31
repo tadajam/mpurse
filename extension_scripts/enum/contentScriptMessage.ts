@@ -14,5 +14,7 @@ export enum ContentScriptMessage {
 
   Mpchain = 'mpurse.mpchain',
   CounterBlock = 'mpurse.counterblock',
-  CounterParty = 'mpurse.counterparty'
+  CounterParty = 'mpurse.counterparty',
+
+  GenerateRandomMnemonic = 'mpurse.generateRandomMnemonic'
 }

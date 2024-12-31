@@ -129,7 +129,8 @@
     "attentionPurge": "すべてのアカウントと設定はあなたの財布から削除されます。続行する前に、元のシードフレーズがあることを確認してください。",
     "purgeAll": "すべて削除します",
     "purge": "削除",
-    "settingsChanged": "設定は変更されました。"
+    "settingsChanged": "設定は変更されました。",
+    "copied": "コピーしました。"
   },
   "signature": {
     "title": "メッセージへ署名",

@@ -129,7 +129,8 @@
     "attentionPurge": "All account and settings will be removed from your wallet. Please make sure you have the original seed phrase before continuing.",
     "purgeAll": "Purge all",
     "purge": "Purge",
-    "settingsChanged": "The settings have been changed."
+    "settingsChanged": "The settings have been changed.",
+    "copied": "Copied"
   },
   "signature": {
     "title": "Signature Message",

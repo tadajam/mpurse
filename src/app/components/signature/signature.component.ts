@@ -103,7 +103,9 @@ export class SignatureComponent implements OnInit {
           )
         )
         .subscribe({
-          next: () => this.backgroundService.closeWindow(),
+          next: () => {
+            this.backgroundService.closeWindow();
+          },
           error: error =>
             this.zone.run(() =>
               this.snackBar.open(error.toString(), '', { duration: 3000 })

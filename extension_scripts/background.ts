@@ -2,13 +2,8 @@ import { ContentScriptMessage } from './enum/contentScriptMessage';
 
 import { EncryptUtil } from './util.encrypt';
 import { MpchainUtil } from './util.mpchain';
-import { Keyring } from './keyring';
-
-declare global {
-  interface Window {
-    bg: Background;
-  }
-}
+import { Hdkey, Keyring } from './keyring';
+import { ExtensionMessage } from './enum/extensionMessage';
 
 interface VaultData {
   hdkey: {
@@ -79,21 +74,59 @@ class Background {
     this.assignEventHandlers();
   }
 
+  private async handleRequest<T>(
+    sendResponse: (response: {
+      success: boolean;
+      body?: T;
+      error?: string;
+    }) => void,
+    handler: () => Promise<T> | T
+  ): Promise<void> {
+    try {
+      const result = await Promise.resolve(handler());
+      sendResponse({ success: true, body: result });
+    } catch (e) {
+      sendResponse({
+        success: false,
+        error: e instanceof Error ? e.message : String(e)
+      });
+    }
+  }
+
+  sendMessageToActiveTab<T>(
+    messageType: ContentScriptMessage,
+    messageData: Record<string, any>,
+    sendResponse: (response: any) => void
+  ): void {
+    chrome.tabs.query({ active: true, windowType: 'normal' }, tabs => {
+      chrome.windows.getLastFocused({ windowTypes: ['normal'] }, window => {
+        if (window.id) {
+          chrome.tabs.query({ active: true, windowId: window.id }, tabs => {
+            if (tabs.length > 0) {
+              chrome.tabs.sendMessage(
+                tabs[tabs.length - 1].id,
+                { type: messageType, ...messageData },
+                contentResponse => {
+                  this.handleRequest(sendResponse, () => contentResponse as T);
+                }
+              );
+            } else {
+              sendResponse({ success: false, error: 'No active tab found' });
+            }
+          });
+        } else {
+          sendResponse({ success: false, error: 'No active tab found' });
+        }
+      });
+    });
+  }
+
   assignEventHandlers(): void {
     chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
       if (port.name === ContentScriptMessage.PortName) {
         port.onMessage.addListener(
           (message: any, connectedPort: chrome.runtime.Port) => {
             switch (message.type) {
-              case ContentScriptMessage.InPageContent:
-                this.readAsTextInpage().then(script => {
-                  connectedPort.postMessage({
-                    type: message.type,
-                    script: script
-                  });
-                });
-                break;
-
               case ContentScriptMessage.InPageInit:
                 connectedPort.onDisconnect.addListener(
                   (initPort: chrome.runtime.Port) => {
@@ -156,33 +189,286 @@ class Background {
       }
     });
 
-    if (
-      this.getPlatform() === Platform.PLATFORM_CHROME ||
-      this.getPlatform() === Platform.PLATFORM_OPERA
-    ) {
-      chrome.runtime.onSuspend.addListener(() => {
-        this.setBadgeText(true);
-      });
-    }
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      switch (message.type) {
+        case ExtensionMessage.IsUnlocked:
+          this.handleRequest<boolean>(sendResponse, () => {
+            return this.getIsUnlocked();
+          });
+          break;
+
+        case ExtensionMessage.Unlock:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.unlock(message.password);
+          });
+          break;
+
+        case ExtensionMessage.Lock:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.lock();
+          });
+          break;
+
+        case ExtensionMessage.GetSelectedAddress:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.getSelectedAddress();
+          });
+          break;
+
+        case ExtensionMessage.SetAccountName:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.setAccountName(message.address, message.name);
+          });
+          break;
+
+        case ExtensionMessage.GetIdentities:
+          this.handleRequest<
+            {
+              address: string;
+              name: string;
+              isImport: boolean;
+            }[]
+          >(sendResponse, () => {
+            return this.getIdentities();
+          });
+          break;
+
+        case ExtensionMessage.ChangeAddress:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.setSelectedAddress(message.address);
+          });
+          break;
+
+        case ExtensionMessage.SaveNewPassphrase:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.saveNewPassphrase(
+              message.passphrase,
+              message.seedVersion,
+              message.basePath,
+              message.baseName
+            );
+          });
+          break;
+
+        case ExtensionMessage.GetPassphrase:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.getPassphrase(message.password);
+          });
+          break;
+
+        case ExtensionMessage.GetHdkey:
+          this.handleRequest<Hdkey>(sendResponse, () => {
+            return this.getHdkey(message.password);
+          });
+          break;
+
+        case ExtensionMessage.CreateAccount:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.createAccount(message.name);
+          });
+          break;
+
+        case ExtensionMessage.ImportAccount:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.importAccount(message.privatekey, message.name);
+          });
+          break;
+
+        case ExtensionMessage.GetPrivatekey:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.getPrivatekey(message.password, message.address);
+          });
+          break;
+
+        case ExtensionMessage.GetPendingRequest:
+          this.handleRequest<any | null>(sendResponse, () => {
+            return this.getPendingRequest(message.id);
+          });
+          break;
+
+        case ExtensionMessage.ShiftRequest:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.shiftRequest(
+              message.isSuccessful,
+              message.id,
+              message.result
+            );
+          });
+          break;
+
+        case ExtensionMessage.SignRawTransaction:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.signRawTransaction(message.tx);
+          });
+          break;
+
+        case ExtensionMessage.SignMessage:
+          this.sendMessageToActiveTab<string>(
+            ContentScriptMessage.SignMessage,
+            {
+              message: message.message,
+              hex: this.keyring.getAccount(this.preferences.selectedAddress)
+                .privatekey
+            },
+            sendResponse
+          );
+          break;
+
+        case ExtensionMessage.SendRawTransaction:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.sendRawTransaction(message.tx);
+          });
+          break;
+
+        case ExtensionMessage.ApproveOrigin:
+          this.handleRequest<boolean>(sendResponse, () => {
+            return this.approveOrigin(message.origin, message.id);
+          });
+          break;
+
+        case ExtensionMessage.RemoveAccount:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.removeAccount(message.address);
+          });
+          break;
+
+        case ExtensionMessage.IncrementAccountName:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.incrementAccountName(message.name, message.num);
+          });
+          break;
+
+        case ExtensionMessage.IsAdvancedModeEnabled:
+          this.handleRequest<boolean>(sendResponse, () => {
+            return this.isAdvancedModeEnabled();
+          });
+          break;
+
+        case ExtensionMessage.SetAdvancedMode:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.setAdvancedMode(message.isEnabled);
+          });
+          break;
+
+        case ExtensionMessage.GetLang:
+          this.handleRequest<string>(sendResponse, () => {
+            return this.getLang();
+          });
+          break;
+
+        case ExtensionMessage.SetLang:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.setLang(message.lang);
+          });
+          break;
+
+        case ExtensionMessage.PurgeAll:
+          this.handleRequest<void>(sendResponse, () => {
+            return this.purgeAll();
+          });
+          break;
+
+        case ExtensionMessage.ExistsVault:
+          this.handleRequest<boolean>(sendResponse, () => {
+            return this.existsVault();
+          });
+          break;
+
+        case ExtensionMessage.GetAddressInfo:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.getAddressInfo(message.address);
+          });
+          break;
+
+        case ExtensionMessage.GetAsset:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.getAsset(message.asset);
+          });
+          break;
+
+        case ExtensionMessage.GetAccountSummary:
+          this.handleRequest<any>(sendResponse, async () => {
+            const identity = this.getIdentity(message.address);
+            const addressInfo = await this.getAddressInfo(message.address);
+
+            if (identity) {
+              addressInfo['name'] = identity.name;
+              addressInfo['isImport'] = identity.isImport;
+            }
+
+            return addressInfo;
+          });
+          break;
+
+        case ExtensionMessage.GetBalances:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.getBalances(
+              message.address,
+              message.page,
+              message.limit
+            );
+          });
+          break;
+
+        case ExtensionMessage.CreateSend:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.createSend(
+              message.source,
+              message.destination,
+              message.asset,
+              message.quantity,
+              message.memo,
+              message.memoIsHex,
+              message.feePerKb,
+              message.disableUtxoLocks
+            ).catch(e => {
+              throw JSON.stringify(e);
+            });
+          });
+          break;
+
+        case ExtensionMessage.Send:
+          this.handleRequest<any>(sendResponse, () => {
+            return this.send(message.tx);
+          });
+          break;
+
+        case ExtensionMessage.GenerateRandomMnemonic:
+          this.sendMessageToActiveTab<string>(
+            ContentScriptMessage.GenerateRandomMnemonic,
+            {
+              seedVersion: message.seedVersion,
+              seedLanguage: message.seedLanguage
+            },
+            sendResponse
+          );
+          break;
+
+        case ExtensionMessage.DecodeBase58:
+          this.handleRequest<Uint8Array>(sendResponse, () => {
+            return this.decodeBase58(message.str);
+          });
+          break;
+
+        default:
+          sendResponse({ success: false, error: 'Unknown message type' });
+      }
+
+      return true;
+    });
   }
 
   setBadgeText(shouldDelete: boolean): void {
     if (this.getPlatform() !== Platform.PLATFORM_FIREFOX_ANDROID) {
-      chrome.browserAction.setBadgeText({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      chrome.action.setBadgeText({
         text:
           shouldDelete || this.requests.length === 0
             ? ''
             : this.requests.length.toString()
       });
     }
-  }
-
-  async readAsTextInpage(): Promise<string> {
-    const inpage = await fetch(
-      chrome.runtime.getURL('extension_scripts/inpage.js'),
-      { method: 'GET' }
-    );
-    return await inpage.text();
   }
 
   private getPlatform(): Platform {
@@ -194,9 +480,6 @@ class Background {
         return Platform.PLATFORM_FIREFOX;
       }
     } else {
-      // if (window && window.chrome && window.chrome.ipcRenderer) {
-      //   return Platform.PLATFORM_BRAVE;
-      // } else
       if (ua.search('Edge') !== -1) {
         return Platform.PLATFORM_EDGE;
       } else if (ua.search('OPR') !== -1) {
@@ -223,10 +506,6 @@ class Background {
 
   signRawTransaction(tx: string): Promise<string> {
     return this.keyring.signTransaction(tx, this.preferences.selectedAddress);
-  }
-
-  signMessage(message: string): string {
-    return this.keyring.signMessage(message, this.preferences.selectedAddress);
   }
 
   async sendRawTransaction(tx: string): Promise<any> {
@@ -704,10 +983,6 @@ class Background {
     return this.saveState(this.keyring.serialize());
   }
 
-  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
-    return this.keyring.generateRandomMnemonic(seedVersion, seedLanguage);
-  }
-
   decodeBase58(str: string): Uint8Array {
     return this.keyring.decodeBase58(str);
   }
@@ -734,7 +1009,7 @@ class Background {
     return passphrase;
   }
 
-  getHdkey(password: string): string {
+  getHdkey(password: string): Hdkey {
     let hdkey = null;
     if (password === this.password) {
       hdkey = this.keyring.getHdkey();
@@ -913,4 +1188,4 @@ class Background {
   }
 }
 
-window.bg = new Background();
+new Background();

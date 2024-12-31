@@ -1,82 +1,125 @@
 import { ContentScriptMessage } from './enum/contentScriptMessage';
 import { InPageMessage } from './enum/inPageMessage';
+import { BitcoreUtil } from './util.bitcore';
 
 class ContentScript {
   private isAlive = false;
   private port: chrome.runtime.Port;
 
   constructor() {
-    this.isAlive = true;
-    this.port = chrome.runtime.connect({ name: ContentScriptMessage.PortName });
     this.assignEventHandlers();
-    this.port.postMessage({ type: ContentScriptMessage.InPageContent });
+    this.connectPort();
   }
 
-  assignEventHandlers(): void {
+  connectPort(): void {
+    this.port = chrome.runtime.connect({ name: ContentScriptMessage.PortName });
+    this.isAlive = true;
+
     this.port.onMessage.addListener((message: any) => {
       if (message && message.type) {
-        if (message.type === ContentScriptMessage.InPageContent) {
-          this.injectScript(message.script);
-        } else {
-          window.postMessage(
-            {
-              action: this.getResponseAction(message.type),
-              id: message.id,
-              data: message.data
-            },
-            '*'
-          );
-        }
+        window.postMessage(
+          {
+            action: this.getResponseAction(message.type),
+            id: message.id,
+            data: message.data
+          },
+          '*'
+        );
       }
     });
 
-    window.addEventListener('message', (event: MessageEvent) => {
+    this.port.onDisconnect.addListener(() => {
+      this.isAlive = false;
+      window.postMessage(
+        {
+          action: InPageMessage.LoginState,
+          id: 0,
+          data: { isUnlocked: false }
+        },
+        '*'
+      );
+      window.postMessage(
+        {
+          action: InPageMessage.AddressState,
+          id: 0,
+          data: { address: '' }
+        },
+        '*'
+      );
+    });
+  }
+
+  assignEventHandlers(): void {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      switch (message.type) {
+        case ContentScriptMessage.GenerateRandomMnemonic:
+          sendResponse(
+            this.generateRandomMnemonic(
+              message.seedVersion,
+              message.seedLanguage
+            )
+          );
+          break;
+        case ContentScriptMessage.SignMessage:
+          sendResponse(this.signMessage(message.message, message.hex));
+          break;
+      }
+      return true;
+    });
+
+    window.addEventListener('message', async (event: MessageEvent) => {
       if (event.origin === window.location.origin && event.data.action) {
-        const data = this.isAlive
-          ? event.data.message
-          : { error: 'Extension context invalidated' };
-        if (this.isAlive) {
+        if (!this.isAlive) {
+          this.connectPort();
+        }
+
+        try {
           this.port.postMessage({
             type: this.getRequestType(event.data.action),
             id: event.data.id,
             origin: event.origin,
-            data: data
+            data: event.data.message
           });
-        } else {
+        } catch (e) {
           window.postMessage(
             {
               action: this.getResponseAction(
                 this.getRequestType(event.data.action)
               ),
               id: event.data.id,
-              data: data
+              data: { error: 'Extension context invalidated' }
             },
             '*'
           );
         }
       }
     });
-
-    this.port.onDisconnect.addListener(() => {
-      this.isAlive = false;
-    });
-
-    window.addEventListener('unload', () => {
-      this.port.disconnect();
+    document.addEventListener('DOMContentLoaded', () => {
+      const head = document.head || document.documentElement;
+      if (head) {
+        this.injectScript();
+      }
     });
   }
 
-  injectScript(inpageContent: string): void {
+  injectScript(): void {
     try {
-      const container = document.head || document.documentElement;
       const scriptTag = document.createElement('script');
-      scriptTag.setAttribute('async', 'false');
-      scriptTag.textContent = inpageContent;
-      container.insertBefore(scriptTag, container.children[0]);
-      container.removeChild(scriptTag);
+      scriptTag.src = chrome.runtime.getURL('extension_scripts/inpage.js');
+      scriptTag.async = false;
+      document.head.appendChild(scriptTag);
+      document.head.removeChild(scriptTag);
     } catch (e) {
       console.error('Script injection failed', e);
     }
+  }
+
+  generateRandomMnemonic(seedVersion: string, seedLanguage: string): string {
+    return BitcoreUtil.generateRandomMnemonic(seedVersion, seedLanguage);
+  }
+
+  signMessage(message: string, hex: string): string {
+    return BitcoreUtil.signMessage(message, hex);
   }
 
   getRequestType(action: InPageMessage): ContentScriptMessage {
